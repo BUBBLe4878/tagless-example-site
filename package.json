@@ -1,0 +1,21 @@
+{
+  "name": "pixel-canvas",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "next": "^16.2.9",
+    "pg": "^8.11.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
