@@ -142,7 +142,7 @@ export default function Home() {
 
     function start() {
       resizeCanvas();
-      while (rowNum < 50) {
+      while (rowNum < 500) {
         colorPixel();
       }
     }
@@ -257,7 +257,7 @@ export default function Home() {
 
         // Create empty rows - use a fixed number of columns
         const cols = 200; // Fixed width instead of calculating from window
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 500; i++) {
           pixelData[`row${i}`] = Array(cols).fill(0);
         }
 
