@@ -236,12 +236,10 @@ async function loadPixelData() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const pixels = await response.json();
-
-    // Make sure pixels is an array
+    let pixels = await response.json(); // Change const to let
     if (!Array.isArray(pixels)) {
       console.error("Expected array, got:", pixels);
-      pixels = [];
+      pixels = []; // ✅ Now it works
     }
 
     // Create empty rows - use a fixed number of columns
