@@ -8,11 +8,11 @@ export default function Home() {
   const rowNumRef = useRef(1);
   const squareWidth = 8;
   const colorToNumber = {
-  "green": 1,
-  "red": 2,
-  "blue": 4
-};
-const numericValue = colorToNumber[color] || 0; 
+    green: 1,
+    red: 2,
+    blue: 4,
+  };
+  const numericValue = colorToNumber[color] || 0;
   let color = "blue";
 
   useEffect(() => {
@@ -118,7 +118,7 @@ const numericValue = colorToNumber[color] || 0;
         body: JSON.stringify({
           row: row,
           col: col,
-           value: numericValue,
+          value: numericValue,
         }),
       })
         .then((response) => response.json())
