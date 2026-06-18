@@ -128,7 +128,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          row: row,
+          row: row+1,//testing out if the pixelk will stay.
           col: col,
           value: numericValue,
         }),
