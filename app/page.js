@@ -7,20 +7,19 @@ export default function Home() {
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
   const squareWidth = 8;
+  const colorRef = useRef("blue"); // Use useRef instead
+
+  const colorToNumber = {
+    green: 0,
+    red: 2,
+    blue: 4,
+  };
 
   useEffect(() => {
-    let color = "blue";
-    const colorToNumber = {
-      green: 1,
-      red: 2,
-      blue: 4,
-    };
-    const numericValue = colorToNumber[color] || 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-
     let pixelData = {
       row0: [],
     };
@@ -37,7 +36,6 @@ export default function Home() {
 
     function resizeCanvas() {
       const dpr = window.devicePixelRatio * 5 || 1;
-
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -56,32 +54,40 @@ export default function Home() {
         }
         ctx.fillRect(
           squareWidth * i,
-          squareWidth * rowNum - squareWidth, //get it to the very top
+          squareWidth * rowNum - squareWidth,
           squareWidth - 0.5,
           squareWidth - 0.5,
         );
       }
-
       rowNum++;
     }
-    document.addEventListener("keydown", (event) => {
-      console.log(event.key);
-    });
-    canvas.addEventListener("click", function (event) {
-      const dpr = window.devicePixelRatio * 5 || 1;
-      const rect = canvas.getBoundingClientRect();
 
-      // Scale the coordinates by DPR to match canvas scaling
-      /*const x = (event.clientX - rect.left) * dpr;
-          const y = (event.clientY - rect.top) * dpr;
-    */
+    // KEYBOARD CONTROLS
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "1") {
+        colorRef.current = "green";
+        console.log("Switched to: green");
+      }
+      if (event.key === "2") {
+        colorRef.current = "red";
+        console.log("Switched to: red");
+      }
+      if (event.key === "3") {
+        colorRef.current = "blue";
+        console.log("Switched to: blue");
+      }
+    });
+
+    // LEFT CLICK
+    canvas.addEventListener("click", function (event) {
+      const rect = canvas.getBoundingClientRect();
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
 
       console.log(`Clicked pixel at row: ${row}, col: ${col}`);
-      ctx.fillStyle = color;
+      ctx.fillStyle = colorRef.current;
       ctx.fillRect(
         col * squareWidth,
         row * squareWidth,
@@ -89,26 +95,33 @@ export default function Home() {
         squareWidth - 0.5,
       );
       editPixelData(row, col);
-      const rowKey = `row${row + 1}`;
-      if (pixelData[rowKey] && pixelData[rowKey][col] !== undefined) {
-        console.log(`Pixel value: ${pixelData[rowKey][col]}`);
-      }
     });
 
-    /* this one was b4 i had claude so the server code sry i dont like using ai :(
-    // function editPixelData(row, col) {
-      let rowNum = `row${row}`;
-      console.log(col);
-      console.log(row);
-      console.log("before: " + pixelData[rowNum][col]);
+    // RIGHT CLICK - Reset to green
+    canvas.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const col = Math.floor(x / squareWidth);
+      const row = Math.floor(y / squareWidth);
 
-      console.log(col);
-      pixelData[rowNum][col] = 4;
-      console.log("after: " + pixelData[rowNum][col]);
-      console.log(pixelData);
-    }
-*/
-    function editPixelData(row, col) {
+      console.log(`Right-clicked pixel at row: ${row}, col: ${col}`);
+      ctx.fillStyle = "green";
+      ctx.fillRect(
+        col * squareWidth,
+        row * squareWidth,
+        squareWidth - 0.5,
+        squareWidth - 0.5
+      );
+
+      editPixelData(row, col, 0); // 0 = green
+    });
+
+    function editPixelData(row, col, value = null) {
+      // Use provided value or current color
+      const numericValue = value !== null ? value : colorToNumber[colorRef.current];
+      
       fetch("/api/pixels", {
         method: "POST",
         headers: {
@@ -123,9 +136,8 @@ export default function Home() {
         .then((response) => response.json())
         .then((data) => {
           console.log("Pixel saved:", data);
-          // Update local pixelData too
           let rowNum = `row${row}`;
-          pixelData[rowNum][col] = 4;
+          pixelData[rowNum][col] = numericValue;
         })
         .catch((err) => console.error("Error saving pixel:", err));
     }
@@ -133,25 +145,18 @@ export default function Home() {
     async function loadPixelData() {
       try {
         const response = await fetch("/api/pixels");
-
         if (!response.ok) {
-          console.error("Server error:", response.status);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         let pixels = await response.json();
-        if (!Array.isArray(pixels)) {
-          console.error("Expected array, got:", pixels);
-          pixels = [];
-        }
+        if (!Array.isArray(pixels)) pixels = [];
 
-        // Create empty rows - use a fixed number of columns
         const cols = 200;
         for (let i = 0; i < 500; i++) {
           pixelData[`row${i}`] = Array(cols).fill(0);
         }
 
-        // Fill in saved pixels from database
         pixels.forEach((pixel) => {
           const rowKey = `row${pixel.row_num}`;
           if (pixelData[rowKey] && pixel.col_num < pixelData[rowKey].length) {
@@ -163,26 +168,14 @@ export default function Home() {
         start();
       } catch (err) {
         console.error("Error loading pixel data:", err);
-        // Fallback: just draw empty canvas
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 500; i++) {
           pixelData[`row${i}`] = Array(200).fill(0);
         }
         start();
       }
     }
-    function changeColor(e) {
-      console.log("old color: " + color);
-      if (e.key === "1") {
-        color = "green";
-        console.log("new color: " + color);
-      }
-      if (e.key === "2") {
-        color = "red";
-        console.log("new color: " + color);
-      }
-    }
+
     loadPixelData();
-    //start();
   }, []);
 
   return (
