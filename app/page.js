@@ -58,7 +58,7 @@ export default function Home() {
 
       rowNum++;
     }
-    canvas.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", (event) => {
       const e = event.key;
       //console.log(e.key);
       changeColor(e);
