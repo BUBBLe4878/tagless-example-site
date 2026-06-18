@@ -7,6 +7,13 @@ export default function Home() {
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
   const squareWidth = 8;
+  let color = "blue";
+
+  document.addEventListener("keydown", (event) => {
+    const e = event.key;
+    console.log(e.key);
+    changeColor(e);
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,7 +79,7 @@ export default function Home() {
       const row = Math.floor(y / squareWidth);
 
       console.log(`Clicked pixel at row: ${row}, col: ${col}`);
-      ctx.fillStyle = "blue";
+      ctx.fillStyle = color;
       ctx.fillRect(
         col * squareWidth,
         row * squareWidth,
@@ -161,7 +168,14 @@ export default function Home() {
         start();
       }
     }
-    function makePixelData() {}
+    function changeColor(e) {
+      if (e.key === "1") {
+        color = "green";
+      }
+      if (e.key === "2") {
+        color = "red";
+      }
+    }
     loadPixelData();
     //start();
   }, []);
