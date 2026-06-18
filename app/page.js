@@ -7,6 +7,12 @@ export default function Home() {
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
   const squareWidth = 8;
+  const colorToNumber = {
+  "green": 1,
+  "red": 2,
+  "blue": 4
+};
+const numericValue = colorToNumber[color] || 0; 
   let color = "blue";
 
   useEffect(() => {
@@ -112,7 +118,7 @@ export default function Home() {
         body: JSON.stringify({
           row: row,
           col: col,
-          value: color,
+           value: numericValue,
         }),
       })
         .then((response) => response.json())
