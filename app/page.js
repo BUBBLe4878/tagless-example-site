@@ -60,7 +60,7 @@ export default function Home() {
     }
     document.addEventListener("keydown", (event) => {
       const e = event.key;
-      //console.log(e.key);
+      console.log(e.key);
       changeColor(e);
     });
     canvas.addEventListener("click", function (event) {
@@ -167,11 +167,14 @@ export default function Home() {
       }
     }
     function changeColor(e) {
+      console.log("old color: " + color);
       if (e.key === "1") {
         color = "green";
+        console.log("new color: " + color);
       }
       if (e.key === "2") {
         color = "red";
+        console.log("new color: " + color);
       }
     }
     loadPixelData();
