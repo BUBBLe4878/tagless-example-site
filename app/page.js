@@ -7,15 +7,15 @@ export default function Home() {
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
   const squareWidth = 8;
-  let color = "blue";
-  const colorToNumber = {
-    green: 1,
-    red: 2,
-    blue: 4,
-  };
-  const numericValue = colorToNumber[color] || 0;
 
   useEffect(() => {
+    let color = "blue";
+    const colorToNumber = {
+      green: 1,
+      red: 2,
+      blue: 4,
+    };
+    const numericValue = colorToNumber[color] || 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -66,7 +66,6 @@ export default function Home() {
     }
     document.addEventListener("keydown", (event) => {
       console.log(event.key);
-      changeColor(event);
     });
     canvas.addEventListener("click", function (event) {
       const dpr = window.devicePixelRatio * 5 || 1;
