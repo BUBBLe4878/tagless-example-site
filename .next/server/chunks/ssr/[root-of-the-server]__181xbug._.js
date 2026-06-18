@@ -1,0 +1,14 @@
+module.exports=[18622,(a,b,c)=>{b.exports=a.x("next/dist/compiled/next-server/app-page-turbo.runtime.prod.js",()=>require("next/dist/compiled/next-server/app-page-turbo.runtime.prod.js"))},42602,(a,b,c)=>{"use strict";b.exports=a.r(18622)},87924,(a,b,c)=>{"use strict";b.exports=a.r(42602).vendored["react-ssr"].ReactJsxRuntime},72131,(a,b,c)=>{"use strict";b.exports=a.r(42602).vendored["react-ssr"].React},30100,a=>{"use strict";var b=a.i(87924),c=a.i(72131);a.s(["default",0,function(){let a=(0,c.useRef)(null),d=(0,c.useRef)({});(0,c.useRef)(1);let e="blue";return(0,c.useEffect)(()=>{let b=a.current;if(!b)return;let c=b.getContext("2d"),f={row0:[]};d.current=f;let g=1;function h(){let a;for(a=5*window.devicePixelRatio||1,b.width=window.innerWidth*a,b.height=window.innerHeight*a,c.setTransform(a,0,0,a,0,0);g<500;)!function(){let a=`row${g}`;console.log(a);for(var d=0;d<b.width/8;d++)4===f[a][d]?c.fillStyle="blue":2===f[a][d]?c.fillStyle="red":c.fillStyle="green",c.fillRect(8*d,8*g-8,7.5,7.5);g++}()}b.addEventListener("keydown",a=>{var b;"1"===(b=a.key).key&&(e="green"),"2"===b.key&&(e="red")}),b.addEventListener("click",function(a){var d,g;window.devicePixelRatio;let h=b.getBoundingClientRect(),i=a.clientX-h.left,j=a.clientY-h.top,k=Math.floor(i/8),l=Math.floor(j/8);console.log(`Clicked pixel at row: ${l}, col: ${k}`),c.fillStyle=e,c.fillRect(8*k,8*l,7.5,7.5),fetch("/api/pixels",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({row:d=l,col:g=k,value:4})}).then(a=>a.json()).then(a=>{console.log("Pixel saved:",a),f[`row${d}`][g]=4}).catch(a=>console.error("Error saving pixel:",a));let m=`row${l+1}`;f[m]&&void 0!==f[m][k]&&console.log(`Pixel value: ${f[m][k]}`)}),async function a(){try{let a=await fetch("/api/pixels");if(!a.ok)throw console.error("Server error:",a.status),Error(`HTTP error! status: ${a.status}`);let b=await a.json();Array.isArray(b)||(console.error("Expected array, got:",b),b=[]);for(let a=0;a<500;a++)f[`row${a}`]=Array(200).fill(0);b.forEach(a=>{let b=`row${a.row_num}`;f[b]&&a.col_num<f[b].length&&(f[b][a.col_num]=a.value)}),console.log("Pixel data loaded:",b.length,"pixels"),h()}catch(a){console.error("Error loading pixel data:",a);for(let a=0;a<50;a++)f[`row${a}`]=Array(200).fill(0);h()}}()},[]),(0,b.jsxs)("html",{children:[(0,b.jsx)("head",{children:(0,b.jsx)("style",{children:`
+          body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+          }
+          canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+          }
+        `})}),(0,b.jsx)("body",{children:(0,b.jsx)("canvas",{ref:a,id:"canvas-id"})})]})}])}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__181xbug._.js.map

@@ -9,12 +9,6 @@ export default function Home() {
   const squareWidth = 8;
   let color = "blue";
 
-  document.addEventListener("keydown", (event) => {
-    const e = event.key;
-    console.log(e.key);
-    changeColor(e);
-  });
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -64,7 +58,11 @@ export default function Home() {
 
       rowNum++;
     }
-
+    canvas.addEventListener("keydown", (event) => {
+      const e = event.key;
+      //console.log(e.key);
+      changeColor(e);
+    });
     canvas.addEventListener("click", function (event) {
       const dpr = window.devicePixelRatio * 5 || 1;
       const rect = canvas.getBoundingClientRect();

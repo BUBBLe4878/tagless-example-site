@@ -1,0 +1,12 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,81694,e=>{"use strict";var l=e.i(43476),o=e.i(71645);e.s(["default",0,function(){let e=(0,o.useRef)(null),r=(0,o.useRef)({});(0,o.useRef)(1);let t="blue";return(0,o.useEffect)(()=>{let l=e.current;if(!l)return;let o=l.getContext("2d"),i={row0:[]};r.current=i;let n=1;function a(){let e;for(e=5*window.devicePixelRatio||1,l.width=window.innerWidth*e,l.height=window.innerHeight*e,o.setTransform(e,0,0,e,0,0);n<500;)!function(){let e=`row${n}`;console.log(e);for(var r=0;r<l.width/8;r++)4===i[e][r]?o.fillStyle="blue":2===i[e][r]?o.fillStyle="red":o.fillStyle="green",o.fillRect(8*r,8*n-8,7.5,7.5);n++}()}l.addEventListener("keydown",e=>{var l;"1"===(l=e.key).key&&(t="green"),"2"===l.key&&(t="red")}),l.addEventListener("click",function(e){var r,n;window.devicePixelRatio;let a=l.getBoundingClientRect(),c=e.clientX-a.left,s=e.clientY-a.top,d=Math.floor(c/8),f=Math.floor(s/8);console.log(`Clicked pixel at row: ${f}, col: ${d}`),o.fillStyle=t,o.fillRect(8*d,8*f,7.5,7.5),fetch("/api/pixels",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({row:r=f,col:n=d,value:4})}).then(e=>e.json()).then(e=>{console.log("Pixel saved:",e),i[`row${r}`][n]=4}).catch(e=>console.error("Error saving pixel:",e));let h=`row${f+1}`;i[h]&&void 0!==i[h][d]&&console.log(`Pixel value: ${i[h][d]}`)}),async function e(){try{let e=await fetch("/api/pixels");if(!e.ok)throw console.error("Server error:",e.status),Error(`HTTP error! status: ${e.status}`);let l=await e.json();Array.isArray(l)||(console.error("Expected array, got:",l),l=[]);for(let e=0;e<500;e++)i[`row${e}`]=Array(200).fill(0);l.forEach(e=>{let l=`row${e.row_num}`;i[l]&&e.col_num<i[l].length&&(i[l][e.col_num]=e.value)}),console.log("Pixel data loaded:",l.length,"pixels"),a()}catch(e){console.error("Error loading pixel data:",e);for(let e=0;e<50;e++)i[`row${e}`]=Array(200).fill(0);a()}}()},[]),(0,l.jsxs)("html",{children:[(0,l.jsx)("head",{children:(0,l.jsx)("style",{children:`
+          body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+          }
+          canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+          }
+        `})}),(0,l.jsx)("body",{children:(0,l.jsx)("canvas",{ref:e,id:"canvas-id"})})]})}])}]);
