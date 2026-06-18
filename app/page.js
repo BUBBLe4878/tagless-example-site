@@ -6,7 +6,7 @@ export default function Home() {
   const canvasRef = useRef(null);
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
-  const squareWidth = 4;//8
+  const squareWidth = 4; //8
   const colorRef = useRef("blue"); // Use useRef instead
 
   const colorToNumber = {
@@ -40,7 +40,68 @@ export default function Home() {
       canvas.height = window.innerHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    let zoomLevel = useRef(1);
+    let offsetX = useRef(0);
+    let offsetY = useRef(0);
 
+    // SCROLL TO ZOOM
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      const zoomSpeed = 0.1;
+      const oldZoom = zoomLevel.current;
+
+      if (event.deltaY < 0) {
+        zoomLevel.current += zoomSpeed; // Scroll up = zoom in
+      } else {
+        zoomLevel.current -= zoomSpeed; // Scroll down = zoom out
+      }
+
+      zoomLevel.current = Math.max(0.5, Math.min(zoomLevel.current, 5)); // Limit zoom between 0.5x and 5x
+
+      // Adjust offset to keep mouse position centered
+      offsetX.current += mouseX * (1 / oldZoom - 1 / zoomLevel.current);
+      offsetY.current += mouseY * (1 / oldZoom - 1 / zoomLevel.current);
+
+      redrawCanvas();
+    });
+
+    function redrawCanvas() {//ai
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(offsetX.current, offsetY.current);
+      ctx.scale(zoomLevel.current, zoomLevel.current);
+
+      // Redraw all pixels
+      for (let row = 0; row < 500; row++) {
+        let rowKey = `row${row}`;
+        if (pixelData[rowKey]) {
+          for (let col = 0; col < pixelData[rowKey].length; col++) {
+            const value = pixelData[rowKey][col];
+            if (value === 4) {
+              ctx.fillStyle = "blue";
+            } else if (value === 2) {
+              ctx.fillStyle = "red";
+            } else {
+              ctx.fillStyle = "green";
+            }
+            ctx.fillRect(
+              squareWidth * col,
+              squareWidth * row,
+              squareWidth - 0.5,
+              squareWidth - 0.5,
+            );
+          }
+        }
+      }
+
+      ctx.restore();
+    }
     function colorPixel() {
       let row = `row${rowNum}`;
       console.log(row);
@@ -79,21 +140,35 @@ export default function Home() {
     });
 
     // LEFT CLICK
+    // LEFT CLICK (UPDATED FOR ZOOM)//ai
     canvas.addEventListener("click", function (event) {
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      // Convert screen coords to canvas coords accounting for zoom/pan
+      x = (x - offsetX.current) / zoomLevel.current;
+      y = (y - offsetY.current) / zoomLevel.current;
+
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
 
       console.log(`Clicked pixel at row: ${row}, col: ${col}`);
       ctx.fillStyle = colorRef.current;
+
+      // Redraw to show the change immediately
+      redrawCanvas();
+      ctx.save();
+      ctx.translate(offsetX.current, offsetY.current);
+      ctx.scale(zoomLevel.current, zoomLevel.current);
       ctx.fillRect(
         col * squareWidth,
         row * squareWidth,
         squareWidth - 0.5,
         squareWidth - 0.5,
       );
+      ctx.restore();
+
       editPixelData(row, col);
     });
 
@@ -112,7 +187,7 @@ export default function Home() {
         col * squareWidth,
         row * squareWidth,
         squareWidth - 0.5,
-        squareWidth - 0.5
+        squareWidth - 0.5,
       );
 
       editPixelData(row, col, 0); // 0 = green
@@ -120,15 +195,16 @@ export default function Home() {
 
     function editPixelData(row, col, value = null) {
       // Use provided value or current color
-      const numericValue = value !== null ? value : colorToNumber[colorRef.current];
-      
+      const numericValue =
+        value !== null ? value : colorToNumber[colorRef.current];
+
       fetch("/api/pixels", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          row: row+1,//testing out if the pixelk will stay.
+          row: row + 1, //testing out if the pixelk will stay.
           col: col,
           value: numericValue,
         }),
