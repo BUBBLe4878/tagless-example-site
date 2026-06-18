@@ -112,7 +112,7 @@ export default function Home() {
         body: JSON.stringify({
           row: row,
           col: col,
-          value: 4,
+          value: color,
         }),
       })
         .then((response) => response.json())
