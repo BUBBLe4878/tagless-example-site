@@ -58,7 +58,7 @@ export default function Home() {
 
       rowNum++;
     }
-    documenst.addEventListener("keydown", (event) => {
+    document.addEventListener("keydown", (event) => {
       console.log(event.key);
       changeColor(event);
     });
