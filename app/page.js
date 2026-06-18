@@ -58,10 +58,9 @@ export default function Home() {
 
       rowNum++;
     }
-    document.addEventListener("keydown", (event) => {
-      const e = event.key;
-      console.log(e.key);
-      changeColor(e);
+    documenst.addEventListener("keydown", (event) => {
+      console.log(event.key);
+      changeColor(event);
     });
     canvas.addEventListener("click", function (event) {
       const dpr = window.devicePixelRatio * 5 || 1;
