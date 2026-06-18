@@ -6,7 +6,7 @@ export default function Home() {
   const canvasRef = useRef(null);
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
-  const squareWidth = 8;
+  const squareWidth = 4;//8
   const colorRef = useRef("blue"); // Use useRef instead
 
   const colorToNumber = {
