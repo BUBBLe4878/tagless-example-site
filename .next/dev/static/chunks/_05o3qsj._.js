@@ -22,6 +22,7 @@ function Home() {
     const squareWidth = 4; //8
     const colorRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])("blue"); // Use useRef instead
     const zoomRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(1);
+    const numCols = 100; //please change this later me <----
     let color = 1; // 3 is green. 1 is blue. 2 is red
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Home.useEffect": ()=>{
@@ -51,7 +52,7 @@ function Home() {
                     } else {
                         zoomRef.current -= zoomSpeed; //zoom out
                     }
-                    zoomRef.current = Math.max(0.2, Math.min(zoomRef.current, 5)); // Limit zoom between 0 and 5x
+                    zoomRef.current = Math.max(1, Math.min(zoomRef.current, 5)); // Limit zoom took forever to get the values right
                     canvas.style.transformOrigin = `${mousePosX}px ${mousePosY}px`; //zoom in on cursor position
                     canvas.style.transform = `scale(${zoomRef.current})`;
                 }
@@ -102,6 +103,10 @@ function Home() {
             //=========== Start ============
             function start() {
                 resizeCanvas();
+                while(rowNum < 500){
+                    addPixels();
+                }
+            //loadPixelData();
             }
             function resizeCanvas() {
                 let dpr = window.devicePixelRatio;
@@ -112,6 +117,47 @@ function Home() {
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
             //========== Building the pixels ==============
+            function addPixels() {
+                let row = `row${rowNum}`;
+                console.log(row);
+                for(var i = 0; i < canvas.width / squareWidth; i++){
+                    if (pixelData[row][i] === 4) {
+                        ctx.fillStyle = "blue";
+                    } else if (pixelData[row][i] === 2) {
+                        ctx.fillStyle = "red";
+                    } else {
+                        ctx.fillStyle = "green";
+                    }
+                    ctx.fillRect(squareWidth * i, squareWidth * rowNum - squareWidth, squareWidth - 0.5, squareWidth - 0.5);
+                }
+                rowNum++;
+            }
+            async function loadPixelData() {
+                //try {
+                const response = await fetch("/api/pixels");
+                let pixels = await response.json();
+                for(let i = 0; i < 500; i++){
+                    pixelData[`row${i}`] = Array(numCols).fill(0);
+                }
+                pixels.forEach({
+                    "Home.useEffect.loadPixelData": (pixel)=>{
+                        const rowKey = `row${pixel.row_num}`;
+                        if (pixelData[rowKey] && pixel.col_num < pixelData[rowKey].length) {
+                            pixelData[rowKey][pixel.col_num] = pixel.value;
+                        }
+                    //dont do this :skulk: editPixelData(pixel.row_num, pixel.col_num, pixel.value);
+                    }
+                }["Home.useEffect.loadPixelData"]);
+                console.log("Pixel data loaded:", pixels.length, "pixels");
+                start();
+            /*} catch (err) {
+        console.error("Error loading pixel data:", err);
+        for (let i = 0; i < 500; i++) {
+          pixelData[`row${i}`] = Array(200).fill(0);
+        }
+        start();
+      }*/ }
+            //========== Edit Pixels =============
             function editPixelData(row, col, value) {
                 console.log("color value: " + color);
                 fetch("/api/pixels", {
@@ -158,7 +204,8 @@ function Home() {
                     return "orange"; //for now
                 }
             }
-            start();
+            loadPixelData();
+        //start();
         }
     }["Home.useEffect"], []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("html", {
@@ -179,12 +226,12 @@ function Home() {
         `
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 171,
+                    lineNumber: 227,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 170,
+                lineNumber: 226,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("body", {
@@ -193,18 +240,18 @@ function Home() {
                     id: "canvas-id"
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 185,
+                    lineNumber: 241,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 184,
+                lineNumber: 240,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.js",
-        lineNumber: 169,
+        lineNumber: 225,
         columnNumber: 5
     }, this);
 }
