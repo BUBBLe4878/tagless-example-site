@@ -59,7 +59,7 @@ export default function Home() {
       zoomRef.current = Math.max(0.5, Math.min(zoomRef.current, 5)); // Limit zoom between 0.5x and 5x
 
       canvas.style.transform = `scale(${zoomRef.current})`;
-      canvas.style.transformOrigin = "0 0"; // Zoom from top-left
+      canvas.style.transformOrigin = mousePosX+" "+mousePosY; // Zoom from top-left
     });
 
     function resizeCanvas() {
