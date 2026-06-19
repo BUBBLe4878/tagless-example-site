@@ -1,0 +1,12 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,81694,e=>{"use strict";var t=e.i(43476),n=e.i(71645);e.s(["default",0,function(){let e=(0,n.useRef)(null);(0,n.useRef)({}),(0,n.useRef)(1),(0,n.useRef)("blue");let o=(0,n.useRef)(1),l=1;return(0,n.useEffect)(()=>{let t=e.current,n=t.getContext("2d"),i=0,r=0,s=[[]];function c(e){return 1===l||1===e?"blue":2===l||2===e?"red":3===l||3===e?"green":4===l||4===e?"orange":void 0}t.addEventListener("mousemove",e=>{e.preventDefault(),i=e.x,r=e.y}),t.addEventListener("wheel",e=>{e.preventDefault(),e.deltaY<0?o.current+=.1:o.current-=.1,o.current=Math.max(.2,Math.min(o.current,5)),t.style.transformOrigin=`${i}px ${r}px`,t.style.transform=`scale(${o.current})`}),document.addEventListener("keydown",e=>{"1"===e.key&&(console.log(" this should be blue '1': "+(l=1)),console.log("Switched to: blue")),"2"===e.key&&(console.log(" this should be red '2': "+(l=2)),console.log("Switched to: red")),"3"===e.key&&(console.log(" this should be green '3': "+(l=3)),console.log("Switched to: green"))}),t.addEventListener("click",function(e){var i,r;let d=t.getBoundingClientRect(),a=e.clientX-d.left,h=e.clientY-d.top;a/=o.current,h/=o.current;let u=Math.floor(a/4),f=Math.floor(h/4);console.log(`Clicked pixel at row: ${f}, col: ${u}`),n.fillStyle=c(),console.log(c()),n.fillRect(4*u,4*f,3.5,3.5),i=f,r=u,console.log("color value: "+c(l)),fetch("/api/pixels",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({row:i+1,col:r,value:l})}).then(e=>e.json()).then(e=>{console.log("Pixel saved:",e),s[`row${i}`][r]=c(void 0)}).catch(e=>console.error("Error saving pixel:",e))}),t.addEventListener("contextmenu",function(e){e.preventDefault()});let d=window.devicePixelRatio;t.width=window.innerWidth*d,t.height=window.innerHeight*d,t.style.width=`${window.innerWidth}px`,t.style.height=`${window.innerHeight}px`,n.setTransform(d,0,0,d,0,0)},[]),(0,t.jsxs)("html",{children:[(0,t.jsx)("head",{children:(0,t.jsx)("style",{children:`
+          body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+          }
+          canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+          }
+        `})}),(0,t.jsx)("body",{children:(0,t.jsx)("canvas",{ref:e,id:"canvas-id"})})]})}])}]);

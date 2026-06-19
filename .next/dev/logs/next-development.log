@@ -1,0 +1,53 @@
+{"timestamp":"00:00:01.432","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:05.861","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:08.776","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:10.919","source":"Browser","level":"LOG","message":"Clicked pixel at row: 103, col: 179"}
+{"timestamp":"00:00:10.919","source":"Browser","level":"LOG","message":"blue"}
+{"timestamp":"00:00:10.919","source":"Browser","level":"LOG","message":"color value: blue"}
+{"timestamp":"00:00:11.437","source":"Server","level":"ERROR","message":"(node:29896) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.\nIn the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.\n\nTo prepare for this change:\n- If you want the current behavior, explicitly use 'sslmode=verify-full'\n- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'\n\nSee https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.\n(Use `node --trace-warnings ...` to show where the warning was created)"}
+{"timestamp":"00:00:11.885","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":179,\"id\":2634,\"row_num\":104,\"value\":1}"}
+{"timestamp":"00:00:11.885","source":"Browser","level":"ERROR","message":"Error saving pixel: {}"}
+{"timestamp":"00:00:11.907","source":"Server","level":"ERROR","message":"[browser] \"Error saving pixel:\" \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '179')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:00:11.908","source":"Browser","level":"ERROR","message":"Error saving pixel: \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '179')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:01:13.203","source":"Server","level":"LOG","message":"✓ Compiled in 23ms"}
+{"timestamp":"00:01:17.210","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:01:19.189","source":"Browser","level":"LOG","message":"Clicked pixel at row: 95, col: 159"}
+{"timestamp":"00:01:19.189","source":"Browser","level":"LOG","message":"blue"}
+{"timestamp":"00:01:19.189","source":"Browser","level":"LOG","message":"color value: 1"}
+{"timestamp":"00:01:19.674","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":159,\"id\":2635,\"row_num\":96,\"value\":1}"}
+{"timestamp":"00:01:19.674","source":"Browser","level":"ERROR","message":"Error saving pixel: {}"}
+{"timestamp":"00:01:19.683","source":"Server","level":"ERROR","message":"[browser] \"Error saving pixel:\" \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '159')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:01:19.683","source":"Browser","level":"ERROR","message":"Error saving pixel: \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '159')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:01:34.725","source":"Browser","level":"LOG","message":" this should be red '2': 2"}
+{"timestamp":"00:01:34.725","source":"Browser","level":"LOG","message":"Switched to: red"}
+{"timestamp":"00:01:36.862","source":"Browser","level":"LOG","message":"Clicked pixel at row: 100, col: 152"}
+{"timestamp":"00:01:36.862","source":"Browser","level":"LOG","message":"red"}
+{"timestamp":"00:01:36.862","source":"Browser","level":"LOG","message":"color value: 2"}
+{"timestamp":"00:01:37.314","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":152,\"id\":2636,\"row_num\":101,\"value\":2}"}
+{"timestamp":"00:01:37.314","source":"Browser","level":"ERROR","message":"Error saving pixel: {}"}
+{"timestamp":"00:01:37.316","source":"Server","level":"ERROR","message":"[browser] \"Error saving pixel:\" \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '152')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:01:37.316","source":"Browser","level":"ERROR","message":"Error saving pixel: \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '152')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:02:05.407","source":"Server","level":"LOG","message":"✓ Compiled in 7ms"}
+{"timestamp":"00:02:09.816","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:02:11.266","source":"Browser","level":"LOG","message":"Clicked pixel at row: 108, col: 146"}
+{"timestamp":"00:02:11.266","source":"Browser","level":"LOG","message":"blue"}
+{"timestamp":"00:02:11.266","source":"Browser","level":"LOG","message":"color value: 1"}
+{"timestamp":"00:02:11.731","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":146,\"id\":2637,\"row_num\":109,\"value\":1}"}
+{"timestamp":"00:02:11.731","source":"Browser","level":"ERROR","message":"Error saving pixel: {}"}
+{"timestamp":"00:02:11.738","source":"Server","level":"ERROR","message":"[browser] \"Error saving pixel:\" \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '146')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:02:11.738","source":"Browser","level":"ERROR","message":"Error saving pixel: \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '146')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:04:23.083","source":"Server","level":"LOG","message":"✓ Compiled in 7ms"}
+{"timestamp":"00:04:30.951","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:04:32.557","source":"Browser","level":"LOG","message":"Clicked pixel at row: 91, col: 171"}
+{"timestamp":"00:04:32.557","source":"Browser","level":"LOG","message":"blue"}
+{"timestamp":"00:04:32.557","source":"Browser","level":"LOG","message":"color value: 1"}
+{"timestamp":"00:04:33.163","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":171,\"id\":2638,\"row_num\":92,\"value\":1}"}
+{"timestamp":"00:04:33.163","source":"Browser","level":"ERROR","message":"Error saving pixel: {}"}
+{"timestamp":"00:04:33.168","source":"Server","level":"ERROR","message":"[browser] \"Error saving pixel:\" \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '171')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:04:33.168","source":"Browser","level":"ERROR","message":"Error saving pixel: \"\\u001b[31mTypeError: Cannot set properties of undefined (setting '171')\\u001b[39m\\n\\u001b[31m    at Home.useEffect.editPixelData (file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:133:48)\\u001b[39m\" \"\\u001b[2m(file://C:/Users/steve/OneDrive/Desktop/tagless example site/.next/dev/static/chunks/_05o3qsj._.js:136:68)\\u001b[22m\""}
+{"timestamp":"00:07:11.254","source":"Server","level":"LOG","message":"✓ Compiled in 13ms"}
+{"timestamp":"00:07:29.869","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:07:32.771","source":"Browser","level":"LOG","message":"Clicked pixel at row: 85, col: 129"}
+{"timestamp":"00:07:32.771","source":"Browser","level":"LOG","message":"blue"}
+{"timestamp":"00:07:32.771","source":"Browser","level":"LOG","message":"color value: 1"}
+{"timestamp":"00:07:33.295","source":"Browser","level":"LOG","message":"Pixel saved: {\"col_num\":129,\"id\":2639,\"row_num\":86,\"value\":1}"}
