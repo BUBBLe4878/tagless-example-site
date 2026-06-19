@@ -109,8 +109,13 @@ export default function Home() {
     // LEFT CLICK
     canvas.addEventListener("click", function (event) {
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      // Account for CSS zoom
+      x = x / zoomRef.current;
+      y = y / zoomRef.current;
+
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
 
@@ -123,6 +128,32 @@ export default function Home() {
         squareWidth - 0.5,
       );
       editPixelData(row, col);
+    });
+
+    // RIGHT CLICK - Reset to green
+    canvas.addEventListener("contextmenu", function (event) {
+      event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      // Account for CSS zoom
+      x = x / zoomRef.current;
+      y = y / zoomRef.current;
+
+      const col = Math.floor(x / squareWidth);
+      const row = Math.floor(y / squareWidth);
+
+      console.log(`Right-clicked pixel at row: ${row}, col: ${col}`);
+      ctx.fillStyle = "green";
+      ctx.fillRect(
+        col * squareWidth,
+        row * squareWidth,
+        squareWidth - 0.5,
+        squareWidth - 0.5,
+      );
+
+      editPixelData(row, col, 0); // 0 = green
     });
 
     // RIGHT CLICK - Reset to green
