@@ -36,9 +36,10 @@ export default function Home() {
 
     function start() {
       resizeCanvas();
-      while (rowNum < 500) {
-        colorPixel();
-      }
+      redrawCanvas();
+      // while (rowNum < 500) {
+      //   colorPixel();
+      // }
     }
 
     function resizeCanvas() {
@@ -51,6 +52,7 @@ export default function Home() {
     // SCROLL TO ZOOM //ai
     canvas.addEventListener("wheel", (event) => {
       event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
 
       const rect = canvas.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
@@ -75,9 +77,15 @@ export default function Home() {
     });
 
     function redrawCanvas() {
-      //ai
+      const dpr = window.devicePixelRatio * 5 || 1;
+
+      // Clear with the full canvas size
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Save the base transformation
       ctx.save();
+
+      // Apply zoom and pan
       ctx.translate(offsetXRef.current, offsetYRef.current);
       ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
 
@@ -150,7 +158,8 @@ export default function Home() {
     let clickStartY = 0;
 
     canvas.addEventListener("mousedown", (event) => {
-      if (event.button === 0) { // Left click
+      if (event.button === 0) {
+        // Left click
         clickStartX = event.clientX;
         clickStartY = event.clientY;
         isPanningRef.current = false;
@@ -160,7 +169,8 @@ export default function Home() {
     });
 
     canvas.addEventListener("mousemove", (event) => {
-      if (event.buttons === 1 && !isPanningRef.current) { // Left button held down
+      if (event.buttons === 1 && !isPanningRef.current) {
+        // Left button held down
         const deltaX = event.clientX - clickStartX;
         const deltaY = event.clientY - clickStartY;
 
@@ -172,8 +182,10 @@ export default function Home() {
 
       // Pan the canvas
       if (isPanningRef.current && event.buttons === 1) {
-        offsetXRef.current = panStartXRef.current + (event.clientX - clickStartX);
-        offsetYRef.current = panStartYRef.current + (event.clientY - clickStartY);
+        offsetXRef.current =
+          panStartXRef.current + (event.clientX - clickStartX);
+        offsetYRef.current =
+          panStartYRef.current + (event.clientY - clickStartY);
         redrawCanvas();
       }
     });
