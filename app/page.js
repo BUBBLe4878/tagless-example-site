@@ -9,6 +9,10 @@ export default function Home() {
   const squareWidth = 4; //8
   const colorRef = useRef("blue"); // Use useRef instead
 
+  const zoomLevelRef = useRef(1);
+  const offsetXRef = useRef(0);
+  const offsetYRef = useRef(0);
+
   const colorToNumber = {
     green: 0,
     red: 2,
@@ -40,11 +44,8 @@ export default function Home() {
       canvas.height = window.innerHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    let zoomLevel = useRef(1);
-    let offsetX = useRef(0);
-    let offsetY = useRef(0);
 
-    // SCROLL TO ZOOM
+    // SCROLL TO ZOOM //ai
     canvas.addEventListener("wheel", (event) => {
       event.preventDefault();
 
@@ -53,29 +54,29 @@ export default function Home() {
       const mouseY = event.clientY - rect.top;
 
       const zoomSpeed = 0.1;
-      const oldZoom = zoomLevel.current;
+      const oldZoom = zoomLevelRef.current;
 
       if (event.deltaY < 0) {
-        zoomLevel.current += zoomSpeed; // Scroll up = zoom in
+        zoomLevelRef.current += zoomSpeed; // Scroll up = zoom in
       } else {
-        zoomLevel.current -= zoomSpeed; // Scroll down = zoom out
+        zoomLevelRef.current -= zoomSpeed; // Scroll down = zoom out
       }
 
-      zoomLevel.current = Math.max(0.5, Math.min(zoomLevel.current, 5)); // Limit zoom between 0.5x and 5x
+      zoomLevelRef.current = Math.max(0.5, Math.min(zoomLevelRef.current, 5)); // Limit zoom between 0.5x and 5x
 
       // Adjust offset to keep mouse position centered
-      offsetX.current += mouseX * (1 / oldZoom - 1 / zoomLevel.current);
-      offsetY.current += mouseY * (1 / oldZoom - 1 / zoomLevel.current);
+      offsetXRef.current += mouseX * (1 / oldZoom - 1 / zoomLevelRef.current);
+      offsetYRef.current += mouseY * (1 / oldZoom - 1 / zoomLevelRef.current);
 
       redrawCanvas();
     });
 
-    function redrawCanvas() {//ai
-      
+    function redrawCanvas() {
+      //ai
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
-      ctx.translate(offsetX.current, offsetY.current);
-      ctx.scale(zoomLevel.current, zoomLevel.current);
+      ctx.translate(offsetXRef.current, offsetYRef.current);
+      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
 
       // Redraw all pixels
       for (let row = 0; row < 500; row++) {
@@ -102,6 +103,7 @@ export default function Home() {
 
       ctx.restore();
     }
+
     function colorPixel() {
       let row = `row${rowNum}`;
       console.log(row);
@@ -115,11 +117,12 @@ export default function Home() {
         }
         ctx.fillRect(
           squareWidth * i,
-          squareWidth * rowNum - squareWidth,
+          squareWidth * rowNum - squareWidth, //get it to the very top
           squareWidth - 0.5,
           squareWidth - 0.5,
         );
       }
+
       rowNum++;
     }
 
@@ -139,16 +142,15 @@ export default function Home() {
       }
     });
 
-    // LEFT CLICK
-    // LEFT CLICK (UPDATED FOR ZOOM)//ai
+    // LEFT CLICK (UPDATED FOR ZOOM) //ai
     canvas.addEventListener("click", function (event) {
       const rect = canvas.getBoundingClientRect();
       let x = event.clientX - rect.left;
       let y = event.clientY - rect.top;
 
       // Convert screen coords to canvas coords accounting for zoom/pan
-      x = (x - offsetX.current) / zoomLevel.current;
-      y = (y - offsetY.current) / zoomLevel.current;
+      x = (x - offsetXRef.current) / zoomLevelRef.current;
+      y = (y - offsetYRef.current) / zoomLevelRef.current;
 
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
@@ -159,8 +161,8 @@ export default function Home() {
       // Redraw to show the change immediately
       redrawCanvas();
       ctx.save();
-      ctx.translate(offsetX.current, offsetY.current);
-      ctx.scale(zoomLevel.current, zoomLevel.current);
+      ctx.translate(offsetXRef.current, offsetYRef.current);
+      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
       ctx.fillRect(
         col * squareWidth,
         row * squareWidth,
@@ -172,16 +174,26 @@ export default function Home() {
       editPixelData(row, col);
     });
 
-    // RIGHT CLICK - Reset to green
+    // RIGHT CLICK - Reset to green (UPDATED FOR ZOOM) //ai
     canvas.addEventListener("contextmenu", function (event) {
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      // Convert screen coords to canvas coords accounting for zoom/pan
+      x = (x - offsetXRef.current) / zoomLevelRef.current;
+      y = (y - offsetYRef.current) / zoomLevelRef.current;
+
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
 
       console.log(`Right-clicked pixel at row: ${row}, col: ${col}`);
+
+      redrawCanvas();
+      ctx.save();
+      ctx.translate(offsetXRef.current, offsetYRef.current);
+      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
       ctx.fillStyle = "green";
       ctx.fillRect(
         col * squareWidth,
@@ -189,10 +201,24 @@ export default function Home() {
         squareWidth - 0.5,
         squareWidth - 0.5,
       );
+      ctx.restore();
 
       editPixelData(row, col, 0); // 0 = green
     });
 
+    /* this one was b4 i had claude so the server code sry i dont like using ai :(
+    // function editPixelData(row, col) {
+      let rowNum = `row${row}`;
+      console.log(col);
+      console.log(row);
+      console.log("before: " + pixelData[rowNum][col]);
+
+      console.log(col);
+      pixelData[rowNum][col] = 4;
+      console.log("after: " + pixelData[rowNum][col]);
+      console.log(pixelData);
+    }
+*/
     function editPixelData(row, col, value = null) {
       // Use provided value or current color
       const numericValue =
@@ -204,7 +230,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          row: row + 1, //testing out if the pixelk will stay.
+          row: row + 1, //testing out if the pixel will stay.
           col: col,
           value: numericValue,
         }),
