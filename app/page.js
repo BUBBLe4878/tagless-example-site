@@ -52,7 +52,6 @@ export default function Home() {
     // SCROLL TO ZOOM //ai
     canvas.addEventListener("wheel", (event) => {
       event.preventDefault();
-      const rect = canvas.getBoundingClientRect();
 
       const rect = canvas.getBoundingClientRect();
       const mouseX = event.clientX - rect.left;
