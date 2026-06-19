@@ -38,11 +38,10 @@ export default function Home() {
     }
     canvas.addEventListener("mousemove", (event) => {
       event.preventDefault();
-      console.log("x"+event.x);
-      console.log("y"+event.y);
+      console.log("x" + event.x);
+      console.log("y" + event.y);
       mousePosX = event.x;
       mousePosY = event.y;
-
     });
 
     // SCROLL TO ZOOM
@@ -56,10 +55,10 @@ export default function Home() {
         zoomRef.current -= zoomSpeed; // Scroll down = zoom out
       }
 
-      zoomRef.current = Math.max(0.5, Math.min(zoomRef.current, 5)); // Limit zoom between 0.5x and 5x
+      zoomRef.current = Math.max(0.2, Math.min(zoomRef.current, 5)); // Limit zoom between 0 and 5x
 
+      canvas.style.transformOrigin = "center center";
       canvas.style.transform = `scale(${zoomRef.current})`;
-      canvas.style.transformOrigin = mousePosX+" "+mousePosY; // Zoom from top-left
     });
 
     function resizeCanvas() {
