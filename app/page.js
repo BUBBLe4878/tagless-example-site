@@ -9,13 +9,6 @@ export default function Home() {
   const squareWidth = 4; //8
   const colorRef = useRef("blue"); // Use useRef instead
 
-  const zoomLevelRef = useRef(1);
-  const offsetXRef = useRef(0);
-  const offsetYRef = useRef(0);
-  const isPanningRef = useRef(false);
-  const panStartXRef = useRef(0);
-  const panStartYRef = useRef(0);
-
   const colorToNumber = {
     green: 0,
     red: 2,
@@ -36,10 +29,9 @@ export default function Home() {
 
     function start() {
       resizeCanvas();
-      redrawCanvas();
-      // while (rowNum < 500) {
-      //   colorPixel();
-      // }
+      while (rowNum < 500) {
+        colorPixel();
+      }
     }
 
     function resizeCanvas() {
@@ -47,71 +39,6 @@ export default function Home() {
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    // SCROLL TO ZOOM //ai
-    canvas.addEventListener("wheel", (event) => {
-      event.preventDefault();
-
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
-
-      const zoomSpeed = 0.1;
-      const oldZoom = zoomLevelRef.current;
-
-      if (event.deltaY < 0) {
-        zoomLevelRef.current += zoomSpeed; // Scroll up = zoom in
-      } else {
-        zoomLevelRef.current -= zoomSpeed; // Scroll down = zoom out
-      }
-
-      zoomLevelRef.current = Math.max(0.5, Math.min(zoomLevelRef.current, 5)); // Limit zoom between 0.5x and 5x
-
-      // Adjust offset to keep mouse position centered
-      offsetXRef.current += mouseX * (1 / oldZoom - 1 / zoomLevelRef.current);
-      offsetYRef.current += mouseY * (1 / oldZoom - 1 / zoomLevelRef.current);
-
-      redrawCanvas();
-    });
-
-    function redrawCanvas() {
-      const dpr = window.devicePixelRatio * 5 || 1;
-
-      // Clear with the full canvas size
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Save the base transformation
-      ctx.save();
-
-      // Apply zoom and pan
-      ctx.translate(offsetXRef.current, offsetYRef.current);
-      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
-
-      // Redraw all pixels
-      for (let row = 0; row < 500; row++) {
-        let rowKey = `row${row}`;
-        if (pixelData[rowKey]) {
-          for (let col = 0; col < pixelData[rowKey].length; col++) {
-            const value = pixelData[rowKey][col];
-            if (value === 4) {
-              ctx.fillStyle = "blue";
-            } else if (value === 2) {
-              ctx.fillStyle = "red";
-            } else {
-              ctx.fillStyle = "green";
-            }
-            ctx.fillRect(
-              squareWidth * col,
-              squareWidth * row,
-              squareWidth - 0.5,
-              squareWidth - 0.5,
-            );
-          }
-        }
-      }
-
-      ctx.restore();
     }
 
     function colorPixel() {
@@ -152,98 +79,35 @@ export default function Home() {
       }
     });
 
-    // LEFT CLICK - Draw or Pan //ai
-    let clickStartX = 0;
-    let clickStartY = 0;
+    // LEFT CLICK
+    canvas.addEventListener("click", function (event) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const col = Math.floor(x / squareWidth);
+      const row = Math.floor(y / squareWidth);
 
-    canvas.addEventListener("mousedown", (event) => {
-      if (event.button === 0) {
-        // Left click
-        clickStartX = event.clientX;
-        clickStartY = event.clientY;
-        isPanningRef.current = false;
-        panStartXRef.current = offsetXRef.current;
-        panStartYRef.current = offsetYRef.current;
-      }
+      console.log(`Clicked pixel at row: ${row}, col: ${col}`);
+      ctx.fillStyle = colorRef.current;
+      ctx.fillRect(
+        col * squareWidth,
+        row * squareWidth,
+        squareWidth - 0.5,
+        squareWidth - 0.5,
+      );
+      editPixelData(row, col);
     });
 
-    canvas.addEventListener("mousemove", (event) => {
-      if (event.buttons === 1 && !isPanningRef.current) {
-        // Left button held down
-        const deltaX = event.clientX - clickStartX;
-        const deltaY = event.clientY - clickStartY;
-
-        // If moved more than 5px, consider it panning
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-          isPanningRef.current = true;
-        }
-      }
-
-      // Pan the canvas
-      if (isPanningRef.current && event.buttons === 1) {
-        offsetXRef.current =
-          panStartXRef.current + (event.clientX - clickStartX);
-        offsetYRef.current =
-          panStartYRef.current + (event.clientY - clickStartY);
-        redrawCanvas();
-      }
-    });
-
-    canvas.addEventListener("mouseup", (event) => {
-      if (event.button === 0 && !isPanningRef.current) {
-        // Left click without dragging = draw
-        const rect = canvas.getBoundingClientRect();
-        let x = event.clientX - rect.left;
-        let y = event.clientY - rect.top;
-
-        // Convert screen coords to canvas coords accounting for zoom/pan
-        x = (x - offsetXRef.current) / zoomLevelRef.current;
-        y = (y - offsetYRef.current) / zoomLevelRef.current;
-
-        const col = Math.floor(x / squareWidth);
-        const row = Math.floor(y / squareWidth);
-
-        console.log(`Clicked pixel at row: ${row}, col: ${col}`);
-
-        redrawCanvas();
-        ctx.save();
-        ctx.translate(offsetXRef.current, offsetYRef.current);
-        ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
-        ctx.fillStyle = colorRef.current;
-        ctx.fillRect(
-          col * squareWidth,
-          row * squareWidth,
-          squareWidth - 0.5,
-          squareWidth - 0.5,
-        );
-        ctx.restore();
-
-        editPixelData(row, col);
-      }
-
-      isPanningRef.current = false;
-    });
-
-    // RIGHT CLICK - Reset to green (UPDATED FOR ZOOM) //ai
+    // RIGHT CLICK - Reset to green
     canvas.addEventListener("contextmenu", function (event) {
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
-      let x = event.clientX - rect.left;
-      let y = event.clientY - rect.top;
-
-      // Convert screen coords to canvas coords accounting for zoom/pan
-      x = (x - offsetXRef.current) / zoomLevelRef.current;
-      y = (y - offsetYRef.current) / zoomLevelRef.current;
-
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
       const col = Math.floor(x / squareWidth);
       const row = Math.floor(y / squareWidth);
 
       console.log(`Right-clicked pixel at row: ${row}, col: ${col}`);
-
-      redrawCanvas();
-      ctx.save();
-      ctx.translate(offsetXRef.current, offsetYRef.current);
-      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
       ctx.fillStyle = "green";
       ctx.fillRect(
         col * squareWidth,
@@ -251,7 +115,6 @@ export default function Home() {
         squareWidth - 0.5,
         squareWidth - 0.5,
       );
-      ctx.restore();
 
       editPixelData(row, col, 0); // 0 = green
     });
@@ -343,10 +206,6 @@ export default function Home() {
             display: block;
             width: 100vw;
             height: 100vh;
-            cursor: grab;
-          }
-          canvas:active {
-            cursor: grabbing;
           }
         `}</style>
       </head>
