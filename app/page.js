@@ -12,6 +12,9 @@ export default function Home() {
   const zoomLevelRef = useRef(1);
   const offsetXRef = useRef(0);
   const offsetYRef = useRef(0);
+  const isPanningRef = useRef(false);
+  const panStartXRef = useRef(0);
+  const panStartYRef = useRef(0);
 
   const colorToNumber = {
     green: 0,
@@ -142,36 +145,72 @@ export default function Home() {
       }
     });
 
-    // LEFT CLICK (UPDATED FOR ZOOM) //ai
-    canvas.addEventListener("click", function (event) {
-      const rect = canvas.getBoundingClientRect();
-      let x = event.clientX - rect.left;
-      let y = event.clientY - rect.top;
+    // LEFT CLICK - Draw or Pan //ai
+    let clickStartX = 0;
+    let clickStartY = 0;
 
-      // Convert screen coords to canvas coords accounting for zoom/pan
-      x = (x - offsetXRef.current) / zoomLevelRef.current;
-      y = (y - offsetYRef.current) / zoomLevelRef.current;
+    canvas.addEventListener("mousedown", (event) => {
+      if (event.button === 0) { // Left click
+        clickStartX = event.clientX;
+        clickStartY = event.clientY;
+        isPanningRef.current = false;
+        panStartXRef.current = offsetXRef.current;
+        panStartYRef.current = offsetYRef.current;
+      }
+    });
 
-      const col = Math.floor(x / squareWidth);
-      const row = Math.floor(y / squareWidth);
+    canvas.addEventListener("mousemove", (event) => {
+      if (event.buttons === 1 && !isPanningRef.current) { // Left button held down
+        const deltaX = event.clientX - clickStartX;
+        const deltaY = event.clientY - clickStartY;
 
-      console.log(`Clicked pixel at row: ${row}, col: ${col}`);
-      ctx.fillStyle = colorRef.current;
+        // If moved more than 5px, consider it panning
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+          isPanningRef.current = true;
+        }
+      }
 
-      // Redraw to show the change immediately
-      redrawCanvas();
-      ctx.save();
-      ctx.translate(offsetXRef.current, offsetYRef.current);
-      ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
-      ctx.fillRect(
-        col * squareWidth,
-        row * squareWidth,
-        squareWidth - 0.5,
-        squareWidth - 0.5,
-      );
-      ctx.restore();
+      // Pan the canvas
+      if (isPanningRef.current && event.buttons === 1) {
+        offsetXRef.current = panStartXRef.current + (event.clientX - clickStartX);
+        offsetYRef.current = panStartYRef.current + (event.clientY - clickStartY);
+        redrawCanvas();
+      }
+    });
 
-      editPixelData(row, col);
+    canvas.addEventListener("mouseup", (event) => {
+      if (event.button === 0 && !isPanningRef.current) {
+        // Left click without dragging = draw
+        const rect = canvas.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        let y = event.clientY - rect.top;
+
+        // Convert screen coords to canvas coords accounting for zoom/pan
+        x = (x - offsetXRef.current) / zoomLevelRef.current;
+        y = (y - offsetYRef.current) / zoomLevelRef.current;
+
+        const col = Math.floor(x / squareWidth);
+        const row = Math.floor(y / squareWidth);
+
+        console.log(`Clicked pixel at row: ${row}, col: ${col}`);
+
+        redrawCanvas();
+        ctx.save();
+        ctx.translate(offsetXRef.current, offsetYRef.current);
+        ctx.scale(zoomLevelRef.current, zoomLevelRef.current);
+        ctx.fillStyle = colorRef.current;
+        ctx.fillRect(
+          col * squareWidth,
+          row * squareWidth,
+          squareWidth - 0.5,
+          squareWidth - 0.5,
+        );
+        ctx.restore();
+
+        editPixelData(row, col);
+      }
+
+      isPanningRef.current = false;
     });
 
     // RIGHT CLICK - Reset to green (UPDATED FOR ZOOM) //ai
@@ -293,6 +332,10 @@ export default function Home() {
             display: block;
             width: 100vw;
             height: 100vh;
+            cursor: grab;
+          }
+          canvas:active {
+            cursor: grabbing;
           }
         `}</style>
       </head>
