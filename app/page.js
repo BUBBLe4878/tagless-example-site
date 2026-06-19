@@ -17,6 +17,8 @@ export default function Home() {
   };
 
   useEffect(() => {
+    let mousePosX = 0;
+    let mousePosY = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -34,6 +36,15 @@ export default function Home() {
         colorPixel();
       }
     }
+    canvas.addEventListener("mousemove", (event) => {
+      event.preventDefault();
+      console.log("x"+event.x);
+      console.log("y"+event.y);
+      mousePosX = event.x;
+      mousePosY = event.y;
+
+    });
+
     // SCROLL TO ZOOM
     canvas.addEventListener("wheel", (event) => {
       event.preventDefault();
@@ -50,7 +61,7 @@ export default function Home() {
       canvas.style.transform = `scale(${zoomRef.current})`;
       canvas.style.transformOrigin = "0 0"; // Zoom from top-left
     });
-    
+
     function resizeCanvas() {
       const dpr = window.devicePixelRatio * 5 || 1;
       canvas.width = window.innerWidth * dpr;
