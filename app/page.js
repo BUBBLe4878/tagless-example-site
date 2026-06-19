@@ -8,6 +8,7 @@ export default function Home() {
   const rowNumRef = useRef(1);
   const squareWidth = 4; //8
   const colorRef = useRef("blue"); // Use useRef instead
+  const zoomRef = useRef(1);
 
   const colorToNumber = {
     green: 0,
@@ -33,7 +34,23 @@ export default function Home() {
         colorPixel();
       }
     }
+    // SCROLL TO ZOOM
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
 
+      const zoomSpeed = 0.1;
+      if (event.deltaY < 0) {
+        zoomRef.current += zoomSpeed; // Scroll up = zoom in
+      } else {
+        zoomRef.current -= zoomSpeed; // Scroll down = zoom out
+      }
+
+      zoomRef.current = Math.max(0.5, Math.min(zoomRef.current, 5)); // Limit zoom between 0.5x and 5x
+
+      canvas.style.transform = `scale(${zoomRef.current})`;
+      canvas.style.transformOrigin = "0 0"; // Zoom from top-left
+    });
+    
     function resizeCanvas() {
       const dpr = window.devicePixelRatio * 5 || 1;
       canvas.width = window.innerWidth * dpr;
