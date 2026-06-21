@@ -284,7 +284,37 @@ function Home() {
                 }
                 return "green";
             }
+            //not a roomba said to add real time updates.
+            function syncPixels() {
+                // Poll for updates every 500ms
+                setInterval({
+                    "Home.useEffect.syncPixels": async ()=>{
+                        try {
+                            const response = await fetch("/api/pixels");
+                            const pixels = await response.json();
+                            // Check for new or changed pixels
+                            pixels.forEach({
+                                "Home.useEffect.syncPixels": (pixel)=>{
+                                    const rowKey = `row${pixel.row_num}`;
+                                    if (pixelData[rowKey]) {
+                                        // If pixel changed, redraw it
+                                        if (pixelData[rowKey][pixel.col_num] !== pixel.value) {
+                                            pixelData[rowKey][pixel.col_num] = pixel.value;
+                                            // Redraw just this pixel
+                                            ctx.fillStyle = declareColor(pixel.value);
+                                            ctx.fillRect(squareWidth * pixel.col_num, squareWidth * pixel.row_num - squareWidth, squareWidth - 0.5, squareWidth - 0.5);
+                                        }
+                                    }
+                                }
+                            }["Home.useEffect.syncPixels"]);
+                        } catch (err) {
+                            console.error("Sync error:", err);
+                        }
+                    }
+                }["Home.useEffect.syncPixels"], 500); // Check every 500ms
+            }
             loadPixelData();
+            syncPixels();
         //start();
         }
     }["Home.useEffect"], []);
@@ -306,12 +336,12 @@ function Home() {
         `
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 282,
+                    lineNumber: 316,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 281,
+                lineNumber: 315,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("body", {
@@ -320,18 +350,18 @@ function Home() {
                     id: "canvas-id"
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 296,
+                    lineNumber: 330,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 295,
+                lineNumber: 329,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.js",
-        lineNumber: 280,
+        lineNumber: 314,
         columnNumber: 5
     }, this);
 }

@@ -28,7 +28,7 @@ export default function Home() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const numCols = canvas.width*2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
+    const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
 
     let mousePosX = 0; //for the zoom in
     let mousePosY = 0; //for the zoom in
@@ -273,7 +273,41 @@ export default function Home() {
 
       return "green";
     }
+
+    //not a roomba said to add real time updates.
+    function syncPixels() {
+      // Poll for updates every 500ms
+      setInterval(async () => {
+        try {
+          const response = await fetch("/api/pixels");
+          const pixels = await response.json();
+
+          // Check for new or changed pixels
+          pixels.forEach((pixel) => {
+            const rowKey = `row${pixel.row_num}`;
+            if (pixelData[rowKey]) {
+              // If pixel changed, redraw it
+              if (pixelData[rowKey][pixel.col_num] !== pixel.value) {
+                pixelData[rowKey][pixel.col_num] = pixel.value;
+
+                // Redraw just this pixel
+                ctx.fillStyle = declareColor(pixel.value);
+                ctx.fillRect(
+                  squareWidth * pixel.col_num,
+                  squareWidth * pixel.row_num - squareWidth,
+                  squareWidth - 0.5,
+                  squareWidth - 0.5,
+                );
+              }
+            }
+          });
+        } catch (err) {
+          console.error("Sync error:", err);
+        }
+      }, 500); // Check every 500ms
+    }
     loadPixelData();
+    syncPixels();
     //start();
   }, []);
   return (
