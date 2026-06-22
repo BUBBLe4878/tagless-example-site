@@ -59,7 +59,8 @@ export default function Home() {
 
     //=========== Event Listeners============
     canvas.addEventListener("mousemove", (event) => {
-      //event.preventDefault();
+      event.preventDefault();
+    drawOtherCursors();
       mousePosX = event.x;
       mousePosY = event.y;
       // Send cursor to Pusher for live updates
