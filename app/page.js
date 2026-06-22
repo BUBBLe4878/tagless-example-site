@@ -141,6 +141,7 @@ export default function Home() {
 
     //=========== Start ============
     function start() {
+      fetch("/api/pixels/cleanup", { method: "POST" });
       resizeCanvas();
       while (rowNum < canvas.height / squareWidth) {
         addPixels();
@@ -306,6 +307,16 @@ export default function Home() {
         }
       }, 500); // Check every 500ms
     }
+    //actuaully ima do this in server.js
+    /*
+    function deleteOverlaped(){
+        const response = await fetch("/api/pixels");
+        const pixels = await response.json();
+        pixels.forEach((pixel) =>{
+
+        })
+    }
+        */
     loadPixelData();
     syncPixels();
     //start();

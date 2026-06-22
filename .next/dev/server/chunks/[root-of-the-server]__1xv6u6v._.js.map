@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 42, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/steve/OneDrive/Desktop/tagless%20example%20site/app/api/pixels/cleanup/route.js"],"sourcesContent":["import { Pool } from 'pg';\r\n\r\nconst pool = new Pool({\r\n  connectionString: process.env.DATABASE_URL,\r\n  ssl: { rejectUnauthorized: false }\r\n});\r\n\r\nexport async function POST(request) {\r\n  try {\r\n    await pool.query(`\r\n      DELETE FROM pixel_data\r\n      WHERE id NOT IN (\r\n        SELECT MIN(id)\r\n        FROM pixel_data\r\n        GROUP BY row_num, col_num\r\n      )\r\n    `);\r\n    return Response.json({ message: \"Duplicates cleared\" });\r\n  } catch (err) {\r\n    return Response.json({ error: \"Failed to clean duplicates\" }, { status: 500 });\r\n  }\r\n}"],"names":["pool","connectionString","process","env","DATABASE_URL","ssl","rejectUnauthorized","POST","request","query","Response","json","message","err","error","status"],"mappings":";;;;AAAA;;;;;;AAEA,MAAMA,OAAO,IAAI,qJAAI,CAAC;IACpBC,kBAAkBC,QAAQC,GAAG,CAACC,YAAY;IAC1CC,KAAK;QAAEC,oBAAoB;IAAM;AACnC;AAEO,eAAeC,KAAKC,OAAO;IAChC,IAAI;QACF,MAAMR,KAAKS,KAAK,CAAC,CAAC;;;;;;;IAOlB,CAAC;QACD,OAAOC,SAASC,IAAI,CAAC;YAAEC,SAAS;QAAqB;IACvD,EAAE,OAAOC,KAAK;QACZ,OAAOH,SAASC,IAAI,CAAC;YAAEG,OAAO;QAA6B,GAAG;YAAEC,QAAQ;QAAI;IAC9E;AACF"}}]
+}

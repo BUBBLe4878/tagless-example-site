@@ -16,7 +16,7 @@ app.use(express.static(".")); // Serves your HTML file
 // PostgreSQL Connection Pool
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 });
 
 // Initialize database on startup
@@ -56,7 +56,7 @@ app.get("/api/pixels/:row/:col", async (req, res) => {
     const { row, col } = req.params;
     const result = await pool.query(
       "SELECT * FROM pixel_data WHERE row_num = $1 AND col_num = $2",
-      [row, col]
+      [row, col],
     );
     res.json(result.rows[0] || null);
   } catch (err) {
@@ -69,7 +69,7 @@ app.get("/api/pixels/:row/:col", async (req, res) => {
 app.post("/api/pixels", async (req, res) => {
   try {
     const { row, col, value } = req.body;
-    
+
     console.log(`Saving pixel: row=${row}, col=${col}, value=${value}`);
 
     const result = await pool.query(
@@ -78,7 +78,7 @@ app.post("/api/pixels", async (req, res) => {
        ON CONFLICT (row_num, col_num) 
        DO UPDATE SET value = $3
        RETURNING *`,
-      [row, col, value]
+      [row, col, value],
     );
 
     console.log("Pixel saved successfully:", result.rows[0]);
@@ -86,7 +86,9 @@ app.post("/api/pixels", async (req, res) => {
   } catch (err) {
     console.error("❌ Error saving pixel:", err.message);
     console.error("Full error:", err);
-    res.status(500).json({ error: "Failed to save pixel", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to save pixel", details: err.message });
   }
 });
 
@@ -96,12 +98,29 @@ app.delete("/api/pixels/:row/:col", async (req, res) => {
     const { row, col } = req.params;
     await pool.query(
       "DELETE FROM pixel_data WHERE row_num = $1 AND col_num = $2",
-      [row, col]
+      [row, col],
     );
     res.json({ message: "Pixel deleted" });
   } catch (err) {
     console.error("Error deleting pixel:", err);
     res.status(500).json({ error: "Failed to delete pixel" });
+  }
+});
+
+app.post("/api/pixels/cleanup", async (req, res) => {
+  try {
+    await pool.query(`
+            DELETE FROM pixel_data
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM pixel_data
+                GROUP BY row_num, col_num
+            )
+        `);
+    res.json({ message: "Duplicates cleared" });
+  } catch (err) {
+    console.error("Error cleaning duplicates:", err);
+    res.status(500).json({ error: "Failed to clean duplicates" });
   }
 });
 
