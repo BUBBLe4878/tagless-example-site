@@ -46,6 +46,12 @@
       "regex": "^/api/pixels(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/pixels(?:/)?$"
+    },
+    {
+      "page": "/api/pixels/cleanup",
+      "regex": "^/api/pixels/cleanup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/pixels/cleanup(?:/)?$"
     }
   ],
   "dataRoutes": [],

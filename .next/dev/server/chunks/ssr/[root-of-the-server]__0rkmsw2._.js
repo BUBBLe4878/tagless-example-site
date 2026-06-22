@@ -72,7 +72,7 @@ function Home() {
     ];
     let color = 1; // 3 is green. 1 is blue. 2 is red
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        const socket = new WebSocket(`ws://localhost:3000`);
+        const socket = new WebSocket(`ws://localhost:3001`);
         const otherCursors = {}; // to store cursor positions
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");

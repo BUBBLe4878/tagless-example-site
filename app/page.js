@@ -3,6 +3,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Pusher from "pusher-js";
+
 export default function Home() {
   const canvasRef = useRef(null);
   const pixelDataRef = useRef({});
@@ -26,8 +28,13 @@ export default function Home() {
   let color = 1; // 3 is green. 1 is blue. 2 is red
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://localhost:3000`);
+    // ======== Pusher initialization ========
+    const pusher = new Pusher("55f12054815fd6e2f2c9", {
+      cluster: "mt1",
+    });
+    const channel = pusher.subscribe("cursors");
     const otherCursors = {}; // to store cursor positions
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
@@ -42,39 +49,26 @@ export default function Home() {
     let pixelXPos = 0;
     let pixelYPos = 0;
 
-    //======== socket =========
-    socket.onopen = () => {
-      console.log("socket opened!!!");
-    };
-
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === "cursor") {
-        otherCursors[message.clientId] = {
-          x: message.x,
-          y: message.y,
-        };
-      }
-    };
-
-    socket.onerror = (err) => {
-      console.error("websocket error ", err);
-    };
+    // Bind to Pusher channel for live cursors
+    channel.bind("cursor-move", (data) => {
+      otherCursors[data.clientId] = {
+        x: data.x,
+        y: data.y,
+      };
+    });
 
     //=========== Event Listeners============
     canvas.addEventListener("mousemove", (event) => {
       //event.preventDefault();
       mousePosX = event.x;
       mousePosY = event.y;
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send(
-          JSON.stringify({
-            type: "cursor",
-            x: event.clientX,
-            y: event.clientY,
-          }),
-        );
-      }
+
+      // Send cursor to Pusher for live updates
+      channel.trigger("client-cursor-move", {
+        clientId: Math.random().toString().substring(2, 8),
+        x: event.clientX,
+        y: event.clientY,
+      });
     });
 
     // zoom
