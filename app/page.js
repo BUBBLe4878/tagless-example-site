@@ -62,7 +62,6 @@ export default function Home() {
       //event.preventDefault();
       mousePosX = event.x;
       mousePosY = event.y;
-
       // Send cursor to Pusher for live updates
       channel.trigger("client-cursor-move", {
         clientId: Math.random().toString().substring(2, 8),
@@ -211,6 +210,7 @@ export default function Home() {
         addPixels();
       }
       navBar();
+      drawOtherCursors();
       //loadPixelData();
     }
 
@@ -373,6 +373,7 @@ export default function Home() {
     }
 
     function drawOtherCursors() {
+      console.log("drawing...");
       Object.entries(otherCursors).forEach(([clientId, pos]) => {
         ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
         ctx.fillRect(pos.x, pos.y, 10, 10);
