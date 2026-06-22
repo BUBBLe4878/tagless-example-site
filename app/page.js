@@ -26,6 +26,8 @@ export default function Home() {
   let color = 1; // 3 is green. 1 is blue. 2 is red
 
   useEffect(() => {
+    const socket = new WebSocket(`ws://localhost:3000`);
+    const otherCursors = {}; // to store cursor positions
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
@@ -36,12 +38,43 @@ export default function Home() {
     let pixelData = {
       row0: [],
     };
+    let brushSize = 1;
+    let pixelXPos = 0;
+    let pixelYPos = 0;
+
+    //======== socket =========
+    socket.onopen = () => {
+      console.log("socket opened!!!");
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "cursor") {
+        otherCursors[message.clientId] = {
+          x: message.x,
+          y: message.y,
+        };
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("websocket error ", err);
+    };
 
     //=========== Event Listeners============
     canvas.addEventListener("mousemove", (event) => {
-      event.preventDefault();
+      //event.preventDefault();
       mousePosX = event.x;
       mousePosY = event.y;
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            type: "cursor",
+            x: event.clientX,
+            y: event.clientY,
+          }),
+        );
+      }
     });
 
     // zoom
@@ -82,6 +115,14 @@ export default function Home() {
         console.log(" this should be green 'hex number string': " + color);
         console.log("Switched to: green");
       }
+      if (event.key === "5") {
+        brushSize = 9;
+        console.log("brushSize " + brushSize);
+      }
+      if (event.key === "6") {
+        brushSize = 25;
+        console.log("brushSize " + brushSize);
+      }
     });
 
     // left click
@@ -114,26 +155,55 @@ export default function Home() {
         });
       } else {
         // Normal pixel
-        let x = clickX;
-        let y = clickY;
+        for (var i = 0; i < brushSize; i++) {
+          let x = clickX;
+          let y = clickY;
 
-        x = x / zoomRef.current;
-        y = y / zoomRef.current;
+          x = x / zoomRef.current;
+          y = y / zoomRef.current;
+          defPixelPos(i);
+          const col = Math.floor(x / squareWidth) + pixelXPos;
+          const row = Math.floor(y / squareWidth) + pixelYPos;
 
-        const col = Math.floor(x / squareWidth);
-        const row = Math.floor(y / squareWidth);
-
-        console.log(`Clicked pixel at row: ${row}, col: ${col}`);
-        ctx.fillStyle = declareColor();
-        ctx.fillRect(
-          col * squareWidth,
-          row * squareWidth,
-          squareWidth - 0.5,
-          squareWidth - 0.5,
-        );
-        editPixelData(row, col);
+          console.log(`Clicked pixel at row: ${row}, col: ${col}`);
+          ctx.fillStyle = declareColor();
+          ctx.fillRect(
+            col * squareWidth,
+            row * squareWidth,
+            squareWidth - 0.5,
+            squareWidth - 0.5,
+          );
+          editPixelData(row, col);
+        }
       }
     });
+
+    function defPixelPos(i) {
+      let positions = {};
+      if (brushSize === 9) {
+        positions = {
+          1: [1, 0],
+          2: [0, 1],
+          3: [1, 1],
+          4: [0, -1],
+          5: [1, -1],
+          6: [-1, -1],
+          7: [-1, 0],
+          8: [-1, 1],
+          9: [0, 0],
+        };
+      }
+      if (brushSize === 25) {
+        let index = 1;
+
+        for (let y = -2; y <= 2; y++) {
+          for (let x = -2; x <= 2; x++) {
+            positions[index++] = [x, y];
+          }
+        }
+      }
+      [pixelXPos, pixelYPos] = positions[i] || [0, 0];
+    }
 
     canvas.addEventListener("contextmenu", function (event) {
       event.preventDefault();
@@ -307,6 +377,17 @@ export default function Home() {
         }
       }, 500); // Check every 500ms
     }
+
+    function drawOtherCursors() {
+      Object.entries(otherCursors).forEach(([clientId, pos]) => {
+        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+        ctx.fillRect(pos.x, pos.y, 10, 10);
+        ctx.fillStyle = "white";
+        ctx.font = "12px Arial";
+        ctx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
+      });
+    }
+
     //actuaully ima do this in server.js
     /*
     function deleteOverlaped(){
@@ -317,6 +398,8 @@ export default function Home() {
         })
     }
         */
+    //ts did not work
+
     loadPixelData();
     syncPixels();
     //start();

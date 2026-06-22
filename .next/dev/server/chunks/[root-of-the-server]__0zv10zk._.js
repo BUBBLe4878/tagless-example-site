@@ -41,12 +41,13 @@ module.exports = mod;
 return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
 
 __turbopack_context__.s([
+    "DELETE",
+    ()=>DELETE,
     "GET",
     ()=>GET,
     "POST",
     ()=>POST
 ]);
-//made by ai
 var __TURBOPACK__imported__module__$5b$externals$5d2f$pg__$5b$external$5d$__$28$pg$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$pg$29$__ = __turbopack_context__.i("[externals]/pg [external] (pg, esm_import, [project]/node_modules/pg)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
     __TURBOPACK__imported__module__$5b$externals$5d2f$pg__$5b$external$5d$__$28$pg$2c$__esm_import$2c$__$5b$project$5d2f$node_modules$2f$pg$29$__
@@ -59,23 +60,6 @@ const pool = new __TURBOPACK__imported__module__$5b$externals$5d2f$pg__$5b$exter
         rejectUnauthorized: false
     }
 });
-// Initialize database
-async function initializeDatabase() {
-    try {
-        await pool.query(`
-      CREATE TABLE IF NOT EXISTS pixel_data (
-        id SERIAL PRIMARY KEY,
-        row_num INT NOT NULL,
-        col_num INT NOT NULL,
-        value INT NOT NULL,
-        UNIQUE(row_num, col_num)
-      );
-    `);
-    } catch (err) {
-        console.error("Database error:", err);
-    }
-}
-initializeDatabase();
 async function GET(request) {
     try {
         const result = await pool.query("SELECT * FROM pixel_data");
@@ -104,6 +88,24 @@ async function POST(request) {
     } catch (err) {
         return Response.json({
             error: "Failed to save pixel"
+        }, {
+            status: 500
+        });
+    }
+}
+async function DELETE(request) {
+    try {
+        const { row, col } = await request.json();
+        await pool.query("DELETE FROM pixel_data WHERE row_num = $1 AND col_num = $2", [
+            row,
+            col
+        ]);
+        return Response.json({
+            message: "Pixel deleted"
+        });
+    } catch (err) {
+        return Response.json({
+            error: "Failed to delete pixel"
         }, {
             status: 500
         });

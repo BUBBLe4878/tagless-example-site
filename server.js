@@ -1,22 +1,55 @@
-//ts was ai cuz idk backend
 require("dotenv").config();
-
 const express = require("express");
 const pg = require("pg");
 const cors = require("cors");
+const WebSocket = require("ws");
+const http = require("http");
 
 const app = express();
 const PORT = 3000;
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(".")); // Serves your HTML file
+app.use(express.static("."));
 
 // PostgreSQL Connection Pool
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
+});
+
+// Store connected clients
+const clients = new Map();
+
+// WebSocket connection
+wss.on("connection", (ws) => {
+  const clientId = Math.random().toString(36).substring(7);
+  clients.set(clientId, ws);
+  console.log(`Client connected: ${clientId}`);
+
+  ws.on("message", (data) => {
+    try {
+      const message = JSON.parse(data);
+      message.clientId = clientId; // Add clientId to message
+
+      // Broadcast to all other clients
+      clients.forEach((client, id) => {
+        if (id !== clientId && client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(message));
+        }
+      });
+    } catch (err) {
+      console.error("WebSocket message error:", err);
+    }
+  });
+
+  ws.on("close", () => {
+    clients.delete(clientId);
+    console.log(`Client disconnected: ${clientId}`);
+  });
 });
 
 // Initialize database on startup
@@ -37,9 +70,7 @@ async function initializeDatabase() {
   }
 }
 
-// API Routes
-
-// GET all pixel data
+// API Routes (same as before)
 app.get("/api/pixels", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM pixel_data");
@@ -50,28 +81,9 @@ app.get("/api/pixels", async (req, res) => {
   }
 });
 
-// GET specific pixel
-app.get("/api/pixels/:row/:col", async (req, res) => {
-  try {
-    const { row, col } = req.params;
-    const result = await pool.query(
-      "SELECT * FROM pixel_data WHERE row_num = $1 AND col_num = $2",
-      [row, col],
-    );
-    res.json(result.rows[0] || null);
-  } catch (err) {
-    console.error("Error fetching pixel:", err);
-    res.status(500).json({ error: "Failed to fetch pixel" });
-  }
-});
-
-// POST/UPDATE a pixel
 app.post("/api/pixels", async (req, res) => {
   try {
     const { row, col, value } = req.body;
-
-    console.log(`Saving pixel: row=${row}, col=${col}, value=${value}`);
-
     const result = await pool.query(
       `INSERT INTO pixel_data (row_num, col_num, value)
        VALUES ($1, $2, $3)
@@ -80,43 +92,23 @@ app.post("/api/pixels", async (req, res) => {
        RETURNING *`,
       [row, col, value],
     );
-
-    console.log("Pixel saved successfully:", result.rows[0]);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error("❌ Error saving pixel:", err.message);
-    console.error("Full error:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to save pixel", details: err.message });
-  }
-});
-
-// DELETE a pixel
-app.delete("/api/pixels/:row/:col", async (req, res) => {
-  try {
-    const { row, col } = req.params;
-    await pool.query(
-      "DELETE FROM pixel_data WHERE row_num = $1 AND col_num = $2",
-      [row, col],
-    );
-    res.json({ message: "Pixel deleted" });
-  } catch (err) {
-    console.error("Error deleting pixel:", err);
-    res.status(500).json({ error: "Failed to delete pixel" });
+    console.error("Error saving pixel:", err);
+    res.status(500).json({ error: "Failed to save pixel" });
   }
 });
 
 app.post("/api/pixels/cleanup", async (req, res) => {
   try {
     await pool.query(`
-            DELETE FROM pixel_data
-            WHERE id NOT IN (
-                SELECT MIN(id)
-                FROM pixel_data
-                GROUP BY row_num, col_num
-            )
-        `);
+      DELETE FROM pixel_data
+      WHERE id NOT IN (
+        SELECT MIN(id)
+        FROM pixel_data
+        GROUP BY row_num, col_num
+      )
+    `);
     res.json({ message: "Duplicates cleared" });
   } catch (err) {
     console.error("Error cleaning duplicates:", err);
@@ -125,7 +117,7 @@ app.post("/api/pixels/cleanup", async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   await initializeDatabase();
 });
