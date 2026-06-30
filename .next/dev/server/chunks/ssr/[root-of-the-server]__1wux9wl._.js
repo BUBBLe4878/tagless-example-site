@@ -156,8 +156,27 @@ function Home() {
         const pusher = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pusher$2d$js$2f$dist$2f$node$2f$pusher$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"]("55f12054815fd6e2f2c9", {
             cluster: "mt1"
         });
+        // ======== Pusher initialization ========
+        pusher.connection.bind("connected", ()=>{
+            console.log("✅ Pusher connected!");
+        });
+        pusher.connection.bind("failed", ()=>{
+            console.log("❌ Pusher failed to connect");
+        });
         const channel = pusher.subscribe("cursors");
+        channel.bind("pusher:subscription_succeeded", ()=>{
+            console.log("✅ Subscribed to cursors channel!");
+        });
+        channel.bind("client-cursor-move", (data)=>{
+            console.log("🎨 Received cursor:", data);
+            otherCursors[data.clientId] = {
+                x: data.x,
+                y: data.y
+            };
+        });
+        //const channel = pusher.subscribe("cursors");
         const otherCursors = {}; // to store cursor positions
+        const clientId = Math.random().toString().substring(2, 8); // is this the fix :sho: i hopesies
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
@@ -171,7 +190,8 @@ function Home() {
         let pixelXPos = 0;
         let pixelYPos = 0;
         // Bind to Pusher channel for live cursors
-        channel.bind("cursor-move", (data)=>{
+        channel.bind("client-cursor-move", (data)=>{
+            console.log("Received cursor:", data); // yay debug :(
             otherCursors[data.clientId] = {
                 x: data.x,
                 y: data.y
@@ -179,13 +199,14 @@ function Home() {
         });
         //=========== Event Listeners============
         canvas.addEventListener("mousemove", (event)=>{
-            //event.preventDefault();
+            event.preventDefault();
+            //drawOtherCursors();
             mousePosX = event.x;
             mousePosY = event.y;
-            drawOtherCursors();
+            console.log("Sending cursor from:", clientId); //more debug
             // Send cursor to Pusher for live updates
             channel.trigger("client-cursor-move", {
-                clientId: Math.random().toString().substring(2, 8),
+                clientId: clientId,
                 x: event.clientX,
                 y: event.clientY
             });
@@ -342,7 +363,7 @@ function Home() {
                 addPixels();
             }
             navBar();
-            drawOtherCursors();
+        //drawOtherCursors();
         //loadPixelData();
         }
         function resizeCanvas() {
@@ -371,7 +392,7 @@ function Home() {
         //========== Building the pixels ==============
         function addPixels() {
             let row = `row${rowNum}`;
-            console.log(row);
+            //console.log(row);
             for(var i = 0; i < canvas.width; i++){
                 ctx.fillStyle = declareColor(pixelData[row][i]);
                 ctx.fillRect(squareWidth * i, squareWidth * rowNum - squareWidth, squareWidth - 0.5, squareWidth - 0.5);
@@ -441,6 +462,7 @@ function Home() {
         }
         //not a roomba said to add real time updates.
         function syncPixels() {
+            drawOtherCursors();
             // Poll for updates every 500ms
             setInterval(async ()=>{
                 try {
@@ -466,6 +488,9 @@ function Home() {
         }
         function drawOtherCursors() {
             console.log("drawing...");
+            //:grr: why doesnt this work???!!!
+            //wait, does it work???
+            //ima put this in a loop and see what happens.
             Object.entries(otherCursors).forEach(([clientId, pos])=>{
                 ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
                 ctx.fillRect(pos.x, pos.y, 10, 10);
@@ -484,6 +509,11 @@ function Home() {
         })
     }
         */ //ts did not work
+        function animationLoop() {
+            drawOtherCursors();
+            requestAnimationFrame(animationLoop);
+        }
+        animationLoop();
         loadPixelData();
         syncPixels();
     //start();
@@ -506,12 +536,12 @@ function Home() {
         `
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 406,
+                    lineNumber: 442,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 405,
+                lineNumber: 441,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("body", {
@@ -520,18 +550,18 @@ function Home() {
                     id: "canvas-id"
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 420,
+                    lineNumber: 456,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 419,
+                lineNumber: 455,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.js",
-        lineNumber: 404,
+        lineNumber: 440,
         columnNumber: 5
     }, this);
 }

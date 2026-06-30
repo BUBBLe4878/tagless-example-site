@@ -32,9 +32,34 @@ export default function Home() {
     const pusher = new Pusher("55f12054815fd6e2f2c9", {
       cluster: "mt1",
     });
+
+    // ======== Pusher initialization ========
+
+    pusher.connection.bind("connected", () => {
+      console.log("✅ Pusher connected!");
+    });
+
+    pusher.connection.bind("failed", () => {
+      console.log("❌ Pusher failed to connect");
+    });
+
     const channel = pusher.subscribe("cursors");
+
+    channel.bind("pusher:subscription_succeeded", () => {
+      console.log("✅ Subscribed to cursors channel!");
+    });
+
+    channel.bind("client-cursor-move", (data) => {
+      console.log("🎨 Received cursor:", data);
+      otherCursors[data.clientId] = {
+        x: data.x,
+        y: data.y,
+      };
+    });
+    //const channel = pusher.subscribe("cursors");
     const otherCursors = {}; // to store cursor positions
 
+    const clientId = Math.random().toString().substring(2, 8); // is this the fix :sho: i hopesies
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
@@ -50,7 +75,8 @@ export default function Home() {
     let pixelYPos = 0;
 
     // Bind to Pusher channel for live cursors
-    channel.bind("cursor-move", (data) => {
+    channel.bind("client-cursor-move", (data) => {
+      console.log("Received cursor:", data); // yay debug :(
       otherCursors[data.clientId] = {
         x: data.x,
         y: data.y,
@@ -60,12 +86,13 @@ export default function Home() {
     //=========== Event Listeners============
     canvas.addEventListener("mousemove", (event) => {
       event.preventDefault();
-    drawOtherCursors();
+      //drawOtherCursors();
       mousePosX = event.x;
       mousePosY = event.y;
+      console.log("Sending cursor from:", clientId); //more debug
       // Send cursor to Pusher for live updates
       channel.trigger("client-cursor-move", {
-        clientId: Math.random().toString().substring(2, 8),
+        clientId: clientId,
         x: event.clientX,
         y: event.clientY,
       });
@@ -211,7 +238,7 @@ export default function Home() {
         addPixels();
       }
       navBar();
-      drawOtherCursors();
+      //drawOtherCursors();
       //loadPixelData();
     }
 
@@ -254,7 +281,7 @@ export default function Home() {
     //========== Building the pixels ==============
     function addPixels() {
       let row = `row${rowNum}`;
-      console.log(row);
+      //console.log(row);
       for (var i = 0; i < canvas.width; i++) {
         ctx.fillStyle = declareColor(pixelData[row][i]);
         ctx.fillRect(
@@ -342,6 +369,7 @@ export default function Home() {
 
     //not a roomba said to add real time updates.
     function syncPixels() {
+      drawOtherCursors();
       // Poll for updates every 500ms
       setInterval(async () => {
         try {
@@ -375,6 +403,9 @@ export default function Home() {
 
     function drawOtherCursors() {
       console.log("drawing...");
+      //:grr: why doesnt this work???!!!
+      //wait, does it work???
+      //ima put this in a loop and see what happens.
       Object.entries(otherCursors).forEach(([clientId, pos]) => {
         ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
         ctx.fillRect(pos.x, pos.y, 10, 10);
@@ -396,6 +427,11 @@ export default function Home() {
         */
     //ts did not work
 
+    function animationLoop() {
+      drawOtherCursors();
+      requestAnimationFrame(animationLoop);
+    }
+    animationLoop();
     loadPixelData();
     syncPixels();
     //start();
