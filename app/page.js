@@ -34,7 +34,7 @@ export default function Home() {
     });
 
     // ======== Pusher initialization ========
-
+    //ai debug
     pusher.connection.bind("connected", () => {
       console.log("✅ Pusher connected!");
     });
