@@ -76,6 +76,7 @@ function Home() {
                 cluster: "mt1"
             });
             // ======== Pusher initialization ========
+            //ai debug
             pusher.connection.bind("connected", {
                 "Home.useEffect": ()=>{
                     console.log("✅ Pusher connected!");
@@ -90,15 +91,6 @@ function Home() {
             channel.bind("pusher:subscription_succeeded", {
                 "Home.useEffect": ()=>{
                     console.log("✅ Subscribed to cursors channel!");
-                }
-            }["Home.useEffect"]);
-            channel.bind("client-cursor-move", {
-                "Home.useEffect": (data)=>{
-                    console.log("🎨 Received cursor:", data);
-                    otherCursors[data.clientId] = {
-                        x: data.x,
-                        y: data.y
-                    };
                 }
             }["Home.useEffect"]);
             //const channel = pusher.subscribe("cursors");
@@ -117,7 +109,7 @@ function Home() {
             let pixelXPos = 0;
             let pixelYPos = 0;
             // Bind to Pusher channel for live cursors
-            channel.bind("client-cursor-move", {
+            channel.bind("cursor-move", {
                 "Home.useEffect": (data)=>{
                     console.log("Received cursor:", data); // yay debug :(
                     otherCursors[data.clientId] = {
@@ -129,16 +121,19 @@ function Home() {
             //=========== Event Listeners============
             canvas.addEventListener("mousemove", {
                 "Home.useEffect": (event)=>{
-                    event.preventDefault();
-                    //drawOtherCursors();
                     mousePosX = event.x;
                     mousePosY = event.y;
-                    console.log("Sending cursor from:", clientId); //more debug
-                    // Send cursor to Pusher for live updates
-                    channel.trigger("client-cursor-move", {
-                        clientId: clientId,
-                        x: event.clientX,
-                        y: event.clientY
+                    // Send to backend instead
+                    fetch("/api/pixels/cursor", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            clientId: clientId,
+                            x: event.clientX,
+                            y: event.clientY
+                        })
                     });
                 }
             }["Home.useEffect"]);
@@ -444,7 +439,8 @@ function Home() {
                 }["Home.useEffect.syncPixels"], 500); // Check every 500ms
             }
             function drawOtherCursors() {
-                console.log("drawing...");
+                console.log(" otherCursors:", otherCursors);
+                //console.log("drawing..."); //dont need ts anymore
                 //:grr: why doesnt this work???!!!
                 //wait, does it work???
                 //ima put this in a loop and see what happens.
@@ -496,12 +492,12 @@ function Home() {
         `
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 442,
+                    lineNumber: 440,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 441,
+                lineNumber: 439,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("body", {
@@ -510,18 +506,18 @@ function Home() {
                     id: "canvas-id"
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 456,
+                    lineNumber: 454,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 455,
+                lineNumber: 453,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.js",
-        lineNumber: 440,
+        lineNumber: 438,
         columnNumber: 5
     }, this);
 }

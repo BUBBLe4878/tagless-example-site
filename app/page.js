@@ -49,13 +49,6 @@ export default function Home() {
       console.log("✅ Subscribed to cursors channel!");
     });
 
-    channel.bind("client-cursor-move", (data) => {
-      console.log("🎨 Received cursor:", data);
-      otherCursors[data.clientId] = {
-        x: data.x,
-        y: data.y,
-      };
-    });
     //const channel = pusher.subscribe("cursors");
     const otherCursors = {}; // to store cursor positions
 
@@ -75,7 +68,7 @@ export default function Home() {
     let pixelYPos = 0;
 
     // Bind to Pusher channel for live cursors
-    channel.bind("client-cursor-move", (data) => {
+    channel.bind("cursor-move", (data) => {
       console.log("Received cursor:", data); // yay debug :(
       otherCursors[data.clientId] = {
         x: data.x,
@@ -85,16 +78,18 @@ export default function Home() {
 
     //=========== Event Listeners============
     canvas.addEventListener("mousemove", (event) => {
-      event.preventDefault();
-      //drawOtherCursors();
       mousePosX = event.x;
       mousePosY = event.y;
-      console.log("Sending cursor from:", clientId); //more debug
-      // Send cursor to Pusher for live updates
-      channel.trigger("client-cursor-move", {
-        clientId: clientId,
-        x: event.clientX,
-        y: event.clientY,
+
+      // Send to backend instead
+      fetch("/api/pixels/cursor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: clientId,
+          x: event.clientX,
+          y: event.clientY,
+        }),
       });
     });
 
@@ -402,7 +397,9 @@ export default function Home() {
     }
 
     function drawOtherCursors() {
-      console.log("drawing...");
+      console.log(" otherCursors:", otherCursors);
+
+      //console.log("drawing..."); //dont need ts anymore
       //:grr: why doesnt this work???!!!
       //wait, does it work???
       //ima put this in a loop and see what happens.
@@ -412,7 +409,8 @@ export default function Home() {
         ctx.fillStyle = "white";
         ctx.font = "12px Arial";
         ctx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
-      });
+
+      })
     }
 
     //actuaully ima do this in server.js

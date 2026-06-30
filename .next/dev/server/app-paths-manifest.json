@@ -1,5 +1,6 @@
 {
   "/api/pixels/cleanup/route": "app/api/pixels/cleanup/route.js",
+  "/api/pixels/cursor/route": "app/api/pixels/cursor/route.js",
   "/api/pixels/route": "app/api/pixels/route.js",
   "/page": "app/page.js"
 }
