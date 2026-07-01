@@ -7,6 +7,7 @@ import Pusher from "pusher-js";
 
 export default function Home() {
   const canvasRef = useRef(null);
+  const cursorCanvasRef = useRef(null); // ADD THIS
   const pixelDataRef = useRef({});
   const rowNumRef = useRef(1);
   const squareWidth = 4; //8
@@ -55,6 +56,11 @@ export default function Home() {
     const clientId = Math.random().toString().substring(2, 8); // is this the fix :sho: i hopesies
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    
+    // ADD THIS - Cursor canvas setup
+    const cursorCanvas = cursorCanvasRef.current;
+    const cursorCtx = cursorCanvas.getContext("2d");
+    
     const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
 
     let mousePosX = 0; //for the zoom in
@@ -247,6 +253,11 @@ export default function Home() {
       canvas.style.height = `${window.innerHeight}px`;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      
+      // ADD THIS - Resize cursor canvas too
+      cursorCanvas.width = window.innerWidth * dpr;
+      cursorCanvas.height = window.innerHeight * dpr;
+      cursorCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     function navBar() {
@@ -397,20 +408,17 @@ export default function Home() {
     }
 
     function drawOtherCursors() {
-      console.log(" otherCursors:", otherCursors);
-
-      //console.log("drawing..."); //dont need ts anymore
-      //:grr: why doesnt this work???!!!
-      //wait, does it work???
-      //ima put this in a loop and see what happens.
+      // Clear cursor canvas completely - CHANGED TO USE cursorCtx
+      cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+      
+      // Draw cursors on cursor canvas only
       Object.entries(otherCursors).forEach(([clientId, pos]) => {
-        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-        ctx.fillRect(pos.x, pos.y, 10, 10);
-        ctx.fillStyle = "white";
-        ctx.font = "12px Arial";
-        ctx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
-
-      })
+        cursorCtx.fillStyle = "rgba(255, 0, 0, 0.5)";
+        cursorCtx.fillRect(pos.x, pos.y, 10, 10);
+        cursorCtx.fillStyle = "white";
+        cursorCtx.font = "12px Arial";
+        cursorCtx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
+      });
     }
 
     //actuaully ima do this in server.js
@@ -443,15 +451,33 @@ export default function Home() {
             overflow: hidden;
             font-family: Arial, sans-serif;
           }
+          .canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+          }
           canvas {
             display: block;
             width: 100vw;
             height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+          #pixel-canvas {
+            z-index: 1;
+          }
+          #cursor-canvas {
+            z-index: 2;
+            pointer-events: none;
           }
         `}</style>
       </head>
       <body>
-        <canvas ref={canvasRef} id="canvas-id" />
+        <div className="canvas-container">
+          <canvas ref={canvasRef} id="pixel-canvas" />
+          <canvas ref={cursorCanvasRef} id="cursor-canvas" />
+        </div>
       </body>
     </html>
   );

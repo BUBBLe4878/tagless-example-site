@@ -19,6 +19,7 @@ var _s = __turbopack_context__.k.signature();
 function Home() {
     _s();
     const canvasRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const cursorCanvasRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null); // ADD THIS
     const pixelDataRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])({});
     const rowNumRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(1);
     const squareWidth = 4; //8
@@ -98,6 +99,9 @@ function Home() {
             const clientId = Math.random().toString().substring(2, 8); // is this the fix :sho: i hopesies
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
+            // ADD THIS - Cursor canvas setup
+            const cursorCanvas = cursorCanvasRef.current;
+            const cursorCtx = cursorCanvas.getContext("2d");
             const numCols = canvas.width * 2; //please change this later me <---- //later me: its fine // later-later me: it needed fixing it took forever figureing this one out
             let mousePosX = 0; //for the zoom in
             let mousePosY = 0; //for the zoom in
@@ -309,6 +313,10 @@ function Home() {
                 canvas.style.width = `${window.innerWidth}px`;
                 canvas.style.height = `${window.innerHeight}px`;
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                // ADD THIS - Resize cursor canvas too
+                cursorCanvas.width = window.innerWidth * dpr;
+                cursorCanvas.height = window.innerHeight * dpr;
+                cursorCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
             function navBar() {
                 const barHeight = 60;
@@ -439,18 +447,16 @@ function Home() {
                 }["Home.useEffect.syncPixels"], 500); // Check every 500ms
             }
             function drawOtherCursors() {
-                console.log(" otherCursors:", otherCursors);
-                //console.log("drawing..."); //dont need ts anymore
-                //:grr: why doesnt this work???!!!
-                //wait, does it work???
-                //ima put this in a loop and see what happens.
+                // Clear cursor canvas completely - CHANGED TO USE cursorCtx
+                cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+                // Draw cursors on cursor canvas only
                 Object.entries(otherCursors).forEach({
                     "Home.useEffect.drawOtherCursors": ([clientId, pos])=>{
-                        ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-                        ctx.fillRect(pos.x, pos.y, 10, 10);
-                        ctx.fillStyle = "white";
-                        ctx.font = "12px Arial";
-                        ctx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
+                        cursorCtx.fillStyle = "rgba(255, 0, 0, 0.5)";
+                        cursorCtx.fillRect(pos.x, pos.y, 10, 10);
+                        cursorCtx.fillStyle = "white";
+                        cursorCtx.font = "12px Arial";
+                        cursorCtx.fillText(clientId.substring(0, 4), pos.x + 15, pos.y + 15);
                     }
                 }["Home.useEffect.drawOtherCursors"]);
             }
@@ -484,44 +490,76 @@ function Home() {
             overflow: hidden;
             font-family: Arial, sans-serif;
           }
+          .canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+          }
           canvas {
             display: block;
             width: 100vw;
             height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+          #pixel-canvas {
+            z-index: 1;
+          }
+          #cursor-canvas {
+            z-index: 2;
+            pointer-events: none;
           }
         `
                 }, void 0, false, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 440,
+                    lineNumber: 448,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 439,
+                lineNumber: 447,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("body", {
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
-                    ref: canvasRef,
-                    id: "canvas-id"
-                }, void 0, false, {
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "canvas-container",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
+                            ref: canvasRef,
+                            id: "pixel-canvas"
+                        }, void 0, false, {
+                            fileName: "[project]/app/page.js",
+                            lineNumber: 478,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
+                            ref: cursorCanvasRef,
+                            id: "cursor-canvas"
+                        }, void 0, false, {
+                            fileName: "[project]/app/page.js",
+                            lineNumber: 479,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
                     fileName: "[project]/app/page.js",
-                    lineNumber: 454,
+                    lineNumber: 477,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/page.js",
-                lineNumber: 453,
+                lineNumber: 476,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/page.js",
-        lineNumber: 438,
+        lineNumber: 446,
         columnNumber: 5
     }, this);
 }
-_s(Home, "eS3JhFTVdtCISiecaEOWlCB+LGU=");
+_s(Home, "2Iwup9AtP26npygVrJQmdytE0Uc=");
 _c = Home;
 var _c;
 __turbopack_context__.k.register(_c, "Home");
