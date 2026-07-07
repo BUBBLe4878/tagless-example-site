@@ -1,20 +1,20 @@
-# Build a Pixel Canvas (completely static — no server needed)
+# pixel canvas tutorial (no server needed)
 
-This tutorial builds a full-screen pixel canvas where **the entire picture is one array**. No server, no database, no fetch — you can open the finished file straight in your browser (or host it anywhere static, like GitHub Pages).
+Hey, so this is a tutorial for how I made the pixel canvas. This version is completely static, meaning theres no server or database or anything. The whole picture is just one array. You can literally double click the html file and it opens in your browser and works.
 
-Each step has:
+Every step has 3 parts:
 
-1. **The new code** for that step
-2. **What it should look like** when you open the page
-3. **Total so far** — the complete file up to that point (collapsed, click to expand)
+1. the new code for that step
+2. what the page should look like when you open it
+3. the total code so far, so if yours isnt working you can compare
 
-The one big idea, up front: **the array is the picture.** Every square on screen is a number in a 2D array, and drawing is just "read the number, paint the color." Change the numbers, change the picture.
+Before we start, the one big idea that makes this whole thing click: **the array IS the picture.** Every square on the screen is just a number in a 2D array. Drawing is just reading the number and painting the right color. Change the numbers, the picture changes. Thats it, thats the whole project.
 
 ---
 
-## Step 1 — The HTML skeleton
+## step 1 - the html skeleton
 
-Every canvas project starts the same way: a page with nothing on it except a `<canvas>` element stretched to fill the whole window.
+Just a page with nothing on it except a canvas stretched to fill the whole window.
 
 ```html
 <!doctype html>
@@ -39,18 +39,17 @@ Every canvas project starts the same way: a page with nothing on it except a `<c
 </html>
 ```
 
-Three small but important details:
+A couple things in the css that look pointless but arent:
 
-- `margin: 0` — browsers add a default margin around the body. Without this, the canvas gets pushed away from the edges and you get scrollbars.
-- `overflow: hidden` — stops scrollbars from ever appearing.
-- `display: block` — canvas is `inline` by default, which adds a mysterious few pixels of space below it. `block` fixes that.
+- `margin: 0` - browsers add a default margin around the body for some reason. Without this the canvas gets pushed away from the edges and you get scrollbars.
+- `overflow: hidden` - makes sure scrollbars never show up.
+- `display: block` - canvas is inline by default which adds this mysterious little gap of space under it. block fixes that.
 
-### What it should look like
+### what it should look like
 
-A completely blank white page. Boring — but if you see scrollbars, something is wrong. Check the CSS.
+A completely blank white page. Boring, I know. But if you see scrollbars something is already wrong, go check the css.
 
-<details>
-<summary><strong>Total so far</strong></summary>
+### total so far
 
 ```html
 <!doctype html>
@@ -75,17 +74,15 @@ A completely blank white page. Boring — but if you see scrollbars, something i
 </html>
 ```
 
-</details>
-
 ---
 
-## Step 2 — Hook up the canvas and make it sharp
+## step 2 - hook up the canvas and make it sharp
 
-Add a `<script>` after the `</body>` tag. First job: grab the canvas, get its 2D drawing context, and size it correctly.
+Add a script tag after the body. First job is grabbing the canvas, getting its 2d context, and sizing it right.
 
-Here's the trap: the CSS makes the canvas *look* 100vw × 100vh, but the canvas's internal drawing surface is a separate size (300 × 150 by default). If you don't match them up, everything you draw comes out stretched and blurry.
+Heres the thing that got me at first: the css makes the canvas LOOK like its 100vw x 100vh, but the canvas has its own internal size thats separate (300x150 by default, dont ask me why). If you dont match them up everything you draw comes out stretched and blurry.
 
-We also multiply by `devicePixelRatio` so the squares stay crisp on high-DPI screens (and by an extra 5 to over-sample — the squares get *really* sharp):
+We also multiply by devicePixelRatio so the squares stay crisp on high res screens. I multiply by an extra 5 on top of that to oversample it, which honestly might be overkill but the squares come out really sharp so im keeping it.
 
 ```html
 <script>
@@ -103,25 +100,24 @@ We also multiply by `devicePixelRatio` so the squares stay crisp on high-DPI scr
 
   resizeCanvas();
 
-  // sanity check: draw one test square
+  // test square to make sure everything works
   ctx.fillStyle = "green";
   ctx.fillRect(0, 0, squareWidth - 0.5, squareWidth - 0.5);
 </script>
 ```
 
-What's going on:
+Whats going on here:
 
-- `canvas.width` / `canvas.height` set the internal pixel resolution to match the window (times the scale factor).
-- `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)` scales all our drawing up by the same factor, so we can keep thinking in normal screen coordinates. Draw an 8px square, get an 8px square.
-- `squareWidth = 8` — every "pixel" on our canvas is an 8×8 square.
-- The `- 0.5` on the size leaves a tiny gap between squares, which gives the grid its pixel-art look.
+- `canvas.width` and `canvas.height` set the internal resolution to match the window (times the scale factor).
+- `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)` scales all our drawing up by that same factor, so we can keep thinking in normal screen coordinates. You draw an 8px square, you get an 8px square.
+- `squareWidth = 8` means every "pixel" on our canvas is an 8x8 square.
+- the `- 0.5` on the size leaves a tiny gap between squares. Thats what gives it the pixel art grid look instead of just being a solid blob of color.
 
-### What it should look like
+### what it should look like
 
-A white page with **one tiny green square in the top-left corner**. That square is proof the whole pipeline works.
+White page with one tiny green square in the top left corner. Not impressive but that square proves the whole pipeline works.
 
-<details>
-<summary><strong>Total so far</strong></summary>
+### total so far
 
 ```html
 <!doctype html>
@@ -158,20 +154,18 @@ A white page with **one tiny green square in the top-left corner**. That square 
 
     resizeCanvas();
 
-    // sanity check: draw one test square
+    // test square to make sure everything works
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, squareWidth - 0.5, squareWidth - 0.5);
   </script>
 </html>
 ```
 
-</details>
-
 ---
 
-## Step 3 — The array IS the picture
+## step 3 - the array is the picture
 
-Here's the core of the whole project. We make one 2D array, `pixelData`, sized to fill the screen. `pixelData[row][col]` is a number, and a lookup table says what color each number means:
+Ok this is the core of the whole project. We make one 2D array called pixelData, sized to fill the screen. `pixelData[row][col]` is a number, and a lookup table says what color each number means.
 
 ```js
 // number -> color. add more colors here whenever you want
@@ -191,9 +185,9 @@ for (let row = 0; row < ROWS; row++) {
 }
 ```
 
-`window.innerHeight / squareWidth` = "how many 8-pixel squares fit top to bottom" — so the grid always exactly fills the window, no matter the screen size.
+`window.innerHeight / squareWidth` is basically asking "how many 8 pixel squares fit top to bottom", so the grid always exactly fills the window no matter the screen size.
 
-Then drawing is dead simple. One function paints a single square by *reading its number from the array*, and another loops over the whole grid:
+Then drawing is simple. One function paints a single square by reading its number from the array, and another one loops over the whole grid.
 
 ```js
 // paint one square, reading its color from the array
@@ -220,23 +214,19 @@ resizeCanvas();
 drawPattern();
 ```
 
-(This replaces the test square from Step 2.)
+(this replaces the test square from step 2)
 
-The position math is the heart of it:
+The position math is the heart of it. Column 3 starts at x = 3 * 8 = 24. Row 2 starts at y = 2 * 8 = 16. Multiply the grid position by squareWidth and thats where the square goes.
 
-- **column → x:** `squareWidth * col` (column 3 starts at x = 24)
-- **row → y:** `squareWidth * row` (row 2 starts at y = 16)
+The `|| "green"` is a safety net. If some number sneaks into the array thats not in the colors table, we just paint green instead of setting fillStyle to undefined and wondering why nothing draws.
 
-The `|| "green"` is a safety net: if a number sneaks into the array that isn't in the `colors` table, we paint green instead of crashing with `fillStyle = undefined`.
+Also, a warning from experience: keep everything 0 based. Row 0 is the top row, drawn at y = 0. I originally had my rows start counting at 1 in one place and 0 in another and my whole grid was shifted by one row and clicks landed on the wrong pixel. I spent way too long on that. Pick 0 based and stick with it everywhere.
 
-> ⚠️ **Off-by-one warning (learned the hard way):** keep everything 0-based — row 0 is the top row, drawn at `y = squareWidth * 0`. If you start counting rows at 1 in one place and 0 in another, your grid gets shifted by one row and clicks land on the wrong pixel. Pick 0-based and stick with it *everywhere*.
+### what it should look like
 
-### What it should look like
+The whole window fills up with a grid of green squares with thin gaps between them. Try this: put `pixelData[2][5] = 4;` right before drawPattern() and refresh. A blue square shows up at row 2 column 5. The picture really is just the data.
 
-The whole window fills with a **grid of green squares** with thin white gaps between them. Try it: set `pixelData[2][5] = 4;` right before `drawPattern()` and refresh — a blue square appears at row 2, column 5. The picture really is just the data.
-
-<details>
-<summary><strong>Total so far</strong></summary>
+### total so far
 
 ```html
 <!doctype html>
@@ -313,13 +303,11 @@ The whole window fills with a **grid of green squares** with thin white gaps bet
 </html>
 ```
 
-</details>
-
 ---
 
-## Step 4 — Draw pictures in the array
+## step 4 - drawing pictures in the array
 
-Since the picture is just numbers, you can *draw with your keyboard*. A small picture is a smaller 2D array — write it so it visually looks like the thing (that's the fun part):
+Since the picture is just numbers, you can draw with your keyboard. A small picture is just a smaller 2D array. Write it out so it visually looks like the thing, thats honestly the fun part.
 
 ```js
 // small pictures are just smaller arrays (2 = red, 4 = blue)
@@ -343,9 +331,9 @@ const smiley = [
 ];
 ```
 
-Squint at the numbers — you can see the heart and the face right in the code.
+Squint at the numbers and you can see the heart and the face right there in the code.
 
-Now a `stamp` function that copies a small picture into the big grid at any position:
+Now we need a stamp function that copies a small picture into the big grid at whatever position you want.
 
 ```js
 // copy a small picture into the big grid, top-left corner at (top, left)
@@ -366,18 +354,17 @@ stamp(heart, 5, 10);
 stamp(smiley, 5, 25);
 ```
 
-Notes:
+How it works:
 
-- `pixelData[top + row][left + col] = art[row][col]` is the whole trick: cell `(row, col)` of the small picture lands at `(top + row, left + col)` of the big grid.
-- The `if` guard skips anything that would land outside the grid, so stamping near an edge can't crash. (Without it, `pixelData[999]` is `undefined` and `undefined[3] = 2` throws an error.)
-- **Stamp before you draw.** `stamp()` only changes the array — the screen updates when `drawPattern()` reads the array. Data first, then display.
+- `pixelData[top + row][left + col] = art[row][col]` is the whole trick. Cell (row, col) of the small picture lands at (top + row, left + col) of the big grid.
+- the if check skips anything that would land outside the grid, so stamping near an edge cant crash. Without it, pixelData[999] is undefined and trying to index into undefined throws an error and your whole script dies.
+- stamp BEFORE you draw. stamp() only changes the array, the screen doesnt update until drawPattern() reads the array. Data first, then display.
 
-### What it should look like
+### what it should look like
 
-The green grid, now with a **red pixel heart** and a **blue pixel smiley** near the top-left. Try changing `stamp(heart, 5, 10)` to different numbers and refresh — the heart moves. Stamp it ten times in a loop. Make your own art array. This is exactly how the old-school "HELLO WORLD" letter grids work too — each letter is just a small array.
+The green grid, but now with a red pixel heart and a blue pixel smiley near the top left. Try changing `stamp(heart, 5, 10)` to different numbers and refresh, the heart moves. Stamp it 10 times in a loop. Make your own art array. This is also exactly how you'd do letters btw, each letter is just a small array (my first version of this project drew HELLO WORLD that way).
 
-<details>
-<summary><strong>Total so far</strong></summary>
+### total so far
 
 ```html
 <!doctype html>
@@ -491,13 +478,11 @@ The green grid, now with a **red pixel heart** and a **blue pixel smiley** near 
 </html>
 ```
 
-</details>
-
 ---
 
-## Step 5 — Click to paint
+## step 5 - click to paint
 
-Last step: make it interactive. When the user clicks, we figure out **which square** they clicked. That's the reverse of the drawing math — instead of `col × squareWidth = x`, we do `x ÷ squareWidth = col` and round down:
+Last step, making it interactive. When you click we need to figure out which square you clicked. Its just the drawing math in reverse. Drawing was col * squareWidth = x, so clicking is x / squareWidth = col, rounded down.
 
 ```js
 canvas.addEventListener("click", function (event) {
@@ -517,7 +502,7 @@ canvas.addEventListener("click", function (event) {
 });
 ```
 
-And while we're at it, redraw when the window resizes so the grid never goes stale:
+And while were at it, redraw when the window resizes so the grid doesnt go stale:
 
 ```js
 window.addEventListener("resize", function () {
@@ -528,19 +513,18 @@ window.addEventListener("resize", function () {
 
 Breaking down the click math:
 
-- `event.clientX` is where you clicked **in the window**; `rect.left` is where the canvas starts. Subtracting gives the position **inside the canvas**.
-- `Math.floor(x / squareWidth)` converts a pixel position into a grid column. A click at x = 20 with 8px squares → `Math.floor(2.5)` → column 2. ✔️
-- We do **not** multiply the click coordinates by `dpr`. The `setTransform` from Step 2 already handles scaling for drawing, so click math works in plain screen coordinates. (Multiplying by dpr here is a classic bug that makes every click land way off — if clicks paint the wrong square, check this first.)
-- Look at the order inside the handler: **update the array first, then call `drawPixel`**. We never paint the canvas directly with a hardcoded color — we change the data and let the same draw function do its job. One source of truth, one way to draw. That discipline is what makes the code easy to extend later.
+- `event.clientX` is where you clicked in the window, `rect.left` is where the canvas starts. Subtract and you get the position inside the canvas.
+- `Math.floor(x / squareWidth)` turns a pixel position into a grid column. Click at x = 20 with 8px squares, thats Math.floor(2.5), column 2.
+- do NOT multiply the click coordinates by dpr. The setTransform from step 2 already handles the scaling for drawing, so the click math works in plain screen coordinates. I had a bug where I multiplied by dpr here and every click landed way off from where I actually clicked. If your clicks paint the wrong square, check this first.
+- look at the order in the handler: update the array FIRST, then call drawPixel. We never paint the canvas directly with some hardcoded color, we change the data and let the same draw function do its thing. One source of truth, one way to draw. Keeping that rule is what makes this easy to add stuff to later.
 
-### What it should look like
+### what it should look like
 
-The finished thing: green grid, red heart, blue smiley — and **clicking any square turns it blue**, exactly under your cursor, with `Painted row 12, col 34` in the console (F12). Resize the window and the grid redraws to fit.
+The finished thing. Green grid, red heart, blue smiley, and clicking any square turns it blue right under your cursor. Open the console (F12) and youll see `Painted row 12, col 34` for every click. Resize the window and the grid redraws to fit.
 
-Refreshing wipes your clicks — that's the honest cost of "completely static." The array only lives in the page's memory. (Making clicks survive a refresh is what a server or `localStorage` is for — see below.)
+One honest downside: refreshing wipes your clicks. Thats the cost of completely static, the array only lives in the pages memory. Making clicks survive a refresh is what a server (or localStorage) is for, see below.
 
-<details>
-<summary><strong>Total so far (the finished file)</strong></summary>
+### total so far (the finished file)
 
 ```html
 <!doctype html>
@@ -675,13 +659,15 @@ Refreshing wipes your clicks — that's the honest cost of "completely static." 
 </html>
 ```
 
-</details>
-
 ---
 
-## Where to go next
+## where to go from here
 
-- **More colors** — the `colors` table is begging for it. Add `1: "black", 3: "yellow"`, make a little palette UI, and store the currently selected number in a variable the click handler uses.
-- **Remember drawings without a server** — `localStorage.setItem("pixels", JSON.stringify(pixelData))` after each click, `JSON.parse` it back on load. Still 100% static!
-- **Letter stamps** — make a small array for each letter (like the H/E/L/O experiment) and a `stampWord()` that stamps them side by side.
-- **Go multiplayer** — when you want everyone to share one canvas, that's when you need a server and database. That's exactly what `index.html` + `server.js` in this project do: every click POSTs to `/api/pixels`, and the page loads all saved pixels on start.
+Some ideas if you wanna keep going:
+
+- **more colors** - the colors table makes this easy. Add like `1: "black", 3: "yellow"`, make a little palette on the side, and keep the currently selected number in a variable that the click handler uses instead of hardcoding 4.
+- **remember drawings without a server** - `localStorage.setItem("pixels", JSON.stringify(pixelData))` after each click, then JSON.parse it back when the page loads. Still 100% static.
+- **letter stamps** - make a small array for each letter and a stampWord() that stamps them side by side. Thats how the HELLO WORLD version worked.
+- **go multiplayer** - if you want everyone to share one canvas thats when you actually need a server and a database. Every click POSTs the pixel to the server, and the page loads all the saved pixels when it starts. Thats what the real index.html + server.js in this repo do, but thats a whole other tutorial.
+
+Thanks for reading, hope this helped.
