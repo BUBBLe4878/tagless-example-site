@@ -1,6 +1,6 @@
-# Build a Pixel Canvas (completely static — no server needed)
+# Pixel Canvas
 
-This tutorial builds a full-screen pixel canvas where **the entire picture is one array**. No server, no database, no fetch — you can open the finished file straight in your browser (or host it anywhere static, like GitHub Pages).
+This tutorial builds a full-screen pixel canvas where **the entire picture is one array**! you can open the finished file straight in your browser (or host it anywhere static, like GitHub Pages).
 
 Each step has:
 
@@ -8,7 +8,7 @@ Each step has:
 2. **What it should look like** when you open the page
 3. **Total so far** — the complete file up to that point (collapsed, click to expand)
 
-The one big idea, up front: **the array is the picture.** Every square on screen is a number in a 2D array, and drawing is just "read the number, paint the color." Change the numbers, change the picture.
+The idea: **the array is the picture.** Every square on screen is a number in a 2D array, and drawing is just "read the number, paint the color." Change the numbers, change the picture.
 
 ---
 
@@ -47,7 +47,7 @@ Three small but important details:
 
 ### What it should look like
 
-A completely blank white page. Boring — but if you see scrollbars, something is wrong. Check the CSS.
+A completely blank white page. If you see scrollbars, something is wrong. Check the CSS.
 
 <details>
 <summary><strong>Total so far</strong></summary>
