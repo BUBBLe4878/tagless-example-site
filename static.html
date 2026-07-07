@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas-id"></canvas>
+  </body>
+  <script>
+    const canvas = document.getElementById("canvas-id");
+    const ctx = canvas.getContext("2d");
+    const squareWidth = 8;
+
+    // number -> color. add more colors here whenever you want
+    const colors = {
+      0: "green",
+      2: "red",
+      4: "blue",
+    };
+
+    // the whole picture is one 2D array: pixelData[row][col]
+    const ROWS = Math.floor(window.innerHeight / squareWidth);
+    const COLS = Math.floor(window.innerWidth / squareWidth);
+
+    const pixelData = [];
+    for (let row = 0; row < ROWS; row++) {
+      pixelData.push(Array(COLS).fill(0));
+    }
+
+    // small pictures are just smaller arrays (2 = red, 4 = blue)
+    const heart = [
+      [0, 2, 2, 0, 2, 2, 0],
+      [2, 2, 2, 2, 2, 2, 2],
+      [2, 2, 2, 2, 2, 2, 2],
+      [0, 2, 2, 2, 2, 2, 0],
+      [0, 0, 2, 2, 2, 0, 0],
+      [0, 0, 0, 2, 0, 0, 0],
+    ];
+
+    const smiley = [
+      [0, 4, 4, 4, 4, 4, 0],
+      [4, 0, 0, 0, 0, 0, 4],
+      [4, 0, 4, 0, 4, 0, 4],
+      [4, 0, 0, 0, 0, 0, 4],
+      [4, 0, 4, 0, 4, 0, 4],
+      [4, 0, 0, 4, 0, 0, 4],
+      [0, 4, 4, 4, 4, 4, 0],
+    ];
+
+    // copy a small picture into the big grid, top-left corner at (top, left)
+    function stamp(art, top, left) {
+      for (let row = 0; row < art.length; row++) {
+        for (let col = 0; col < art[row].length; col++) {
+          if (
+            pixelData[top + row] &&
+            pixelData[top + row][left + col] !== undefined
+          ) {
+            pixelData[top + row][left + col] = art[row][col];
+          }
+        }
+      }
+    }
+
+    stamp(heart, 5, 10);
+    stamp(smiley, 5, 25);
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio * 5 || 1;
+
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // paint one square, reading its color from the array
+    function drawPixel(row, col) {
+      ctx.fillStyle = colors[pixelData[row][col]] || "green";
+      ctx.fillRect(
+        squareWidth * col,
+        squareWidth * row,
+        squareWidth - 0.5,
+        squareWidth - 0.5,
+      );
+    }
+
+    // paint the whole grid
+    function drawPattern() {
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          drawPixel(row, col);
+        }
+      }
+    }
+
+    canvas.addEventListener("click", function (event) {
+      const rect = canvas.getBoundingClientRect();
+
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const col = Math.floor(x / squareWidth);
+      const row = Math.floor(y / squareWidth);
+
+      // ignore clicks outside the grid
+      if (!pixelData[row] || pixelData[row][col] === undefined) return;
+
+      pixelData[row][col] = 4;
+      drawPixel(row, col);
+      console.log(`Painted row ${row}, col ${col}`);
+    });
+
+    window.addEventListener("resize", function () {
+      resizeCanvas();
+      drawPattern();
+    });
+
+    resizeCanvas();
+    drawPattern();
+  </script>
+</html>
