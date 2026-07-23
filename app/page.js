@@ -302,31 +302,38 @@ export default function Home() {
     }
 
     async function loadPixelData() {
-      //try {
-      const response = await fetch("/api/pixels");
+      try {
+        const response = await fetch("/api/pixels");
 
-      let pixels = await response.json();
-
-      for (let i = 0; i < 500; i++) {
-        pixelData[`row${i}`] = Array(numCols).fill(0);
-      }
-
-      pixels.forEach((pixel) => {
-        const rowKey = `row${pixel.row_num}`;
-        if (pixelData[rowKey] && pixel.col_num < pixelData[rowKey].length) {
-          pixelData[rowKey][pixel.col_num] = pixel.value;
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
         }
-        //dont do this :skulk: editPixelData(pixel.row_num, pixel.col_num, pixel.value);
-      });
-      console.log("Pixel data loaded:", pixels.length, "pixels");
-      start();
-      /*} catch (err) {
+
+        let pixels = await response.json();
+
+        if (!Array.isArray(pixels)) {
+          throw new Error("Invalid response: pixels is not an array");
+        }
+
+        for (let i = 0; i < 500; i++) {
+          pixelData[`row${i}`] = Array(numCols).fill(0);
+        }
+
+        pixels.forEach((pixel) => {
+          const rowKey = `row${pixel.row_num}`;
+          if (pixelData[rowKey] && pixel.col_num < pixelData[rowKey].length) {
+            pixelData[rowKey][pixel.col_num] = pixel.value;
+          }
+        });
+        console.log("Pixel data loaded:", pixels.length, "pixels");
+        start();
+      } catch (err) {
         console.error("Error loading pixel data:", err);
         for (let i = 0; i < 500; i++) {
           pixelData[`row${i}`] = Array(200).fill(0);
         }
         start();
-      }*/
+      }
     }
     //========== Edit Pixels =============
     function editPixelData(row, col, value) {
@@ -380,7 +387,16 @@ export default function Home() {
       setInterval(async () => {
         try {
           const response = await fetch("/api/pixels");
+
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+
           const pixels = await response.json();
+
+          if (!Array.isArray(pixels)) {
+            throw new Error("Invalid response: pixels is not an array");
+          }
 
           // Check for new or changed pixels
           pixels.forEach((pixel) => {

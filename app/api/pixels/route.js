@@ -10,7 +10,8 @@ export async function GET(request) {
     const result = await pool.query("SELECT * FROM pixel_data");
     return Response.json(result.rows);
   } catch (err) {
-    return Response.json({ error: "Failed to fetch pixels" }, { status: 500 });
+    console.error("GET /api/pixels error:", err.message);
+    return Response.json({ error: "Failed to fetch pixels", details: err.message }, { status: 500 });
   }
 }
 
